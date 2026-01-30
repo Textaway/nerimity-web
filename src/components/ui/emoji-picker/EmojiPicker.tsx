@@ -37,6 +37,7 @@ import { useDocumentListener } from "@/common/useDocumentListener";
 import { emojis, lazyLoadEmojis } from "@/emoji";
 import { Delay } from "@/common/Delay";
 import { Rerun } from "@solid-primitives/keyed";
+import Input from "../input/Input";
 
 const [gifPickerSearch, setGifPickerSearch] = createSignal("");
 
@@ -58,8 +59,8 @@ export function EmojiPicker(props: {
   createEffect(
     on(
       () => props.tab,
-      () => setSelectedTab(props.tab ?? "EMOJI")
-    )
+      () => setSelectedTab(props.tab ?? "EMOJI"),
+    ),
   );
 
   useDocumentListener("keydown", (e) => {
@@ -101,6 +102,7 @@ export function EmojiPicker(props: {
       .map((e) => {
         const server = servers.get(e.serverId!)!;
         const url = server.avatarUrl();
+
         return {
           id: e.id,
           category: {
@@ -114,7 +116,7 @@ export function EmojiPicker(props: {
           },
           name: e.name,
           url: `${env.NERIMITY_CDN}emojis/${e.id}.${
-            e.gif ? "gif" : "webp"
+            e.gif && !e.webp ? "gif" : "webp"
           }?size=60`,
         };
       })
@@ -122,8 +124,8 @@ export function EmojiPicker(props: {
         a.category.id === params.serverId
           ? -1
           : b.category.id === params.serverId
-          ? 1
-          : 0
+            ? 1
+            : 0,
       ) as CustomEmoji[];
   };
 
@@ -199,7 +201,7 @@ export function EmojiPicker(props: {
 
 const GifPicker = (props: { gifPicked?: (gif: TenorImage) => void }) => {
   const [scrollElement, setScrollElement] = createSignal<HTMLElement | null>(
-    null
+    null,
   );
 
   onCleanup(() => {
@@ -209,7 +211,7 @@ const GifPicker = (props: { gifPicked?: (gif: TenorImage) => void }) => {
   createEffect(
     on(gifPickerSearch, () => {
       scrollElement()?.scrollTo(0, 0);
-    })
+    }),
   );
 
   return (
@@ -233,7 +235,7 @@ const GifPicker = (props: { gifPicked?: (gif: TenorImage) => void }) => {
 const GifPickerSearchBar = () => {
   const { isMobileAgent } = useWindowProperties();
 
-  let inputRef: HTMLInputElement | undefined;
+  const [inputRef, setInputRef] = createSignal<HTMLInputElement | null>(null);
   let timeout: null | number = null;
   const onInput = (e: InputEvent) => {
     if (timeout) {
@@ -247,17 +249,24 @@ const GifPickerSearchBar = () => {
 
   onMount(() => {
     if (!isMobileAgent()) {
-      inputRef?.focus();
+      inputRef()?.focus();
     }
   });
 
   return (
     <div class={styles.gifPickerSearchBar}>
-      <input
+      <Input
         ref={inputRef}
-        placeholder="Search GIFs"
+        placeholder="Search KLIPY"
         value={gifPickerSearch()}
         onInput={onInput}
+        class={styles.gifPickerSearchBarInput}
+        suffix={
+          <img
+            class={styles.poweredByKlipy}
+            src="/assets/klipy-powered-by.png"
+          />
+        }
       />
     </div>
   );
@@ -287,7 +296,7 @@ const GifPickerImages = (props: {
 
     const res = await getTenorImages(
       props.query,
-      loadMore ? tenorResponse()?.next : undefined
+      loadMore ? tenorResponse()?.next : undefined,
     );
 
     if (!res) {
@@ -320,8 +329,8 @@ const GifPickerImages = (props: {
       () => props.query,
       () => {
         loadImages();
-      }
-    )
+      },
+    ),
   );
 
   return (
@@ -472,7 +481,7 @@ const GifPickerCategories = (props: {
         css`
           flex-wrap: wrap;
           gap: 6px;
-        `
+        `,
       )}
       style={{ display: props.hide ? "none" : "flex" }}
     >

@@ -50,7 +50,7 @@
   &:hover {
     background-color: rgba(255, 255, 255, 0.03);
     .roleName {
-      color: white;
+      opacity: 1;
     }
   }
   .roleName {
@@ -58,7 +58,7 @@
     overflow: hidden;
     align-items: center;
     padding-left: 4px;
-    color: rgba(255, 255, 255, 0.6);
+    opacity: 0.6;
     transition: 0.2s;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -236,6 +236,7 @@
     -webkit-background-clip: text;
     background-clip: text;
     text-overflow: ellipsis;
+    letter-spacing: var(--ls);
     white-space: nowrap;
     font-family: var(--font);
     font-size: calc(16px * var(--scale, 1));
@@ -279,6 +280,58 @@
   img {
     width: 20px;
     height: 20px;
+  }
+}
+
+.searchSelectedUsers {
+  display: flex;
+  flex-wrap: wrap;
+  margin-top: 6px;
+  user-select: none;
+  gap: 6px;
+  .searchSelectedUser {
+    display: flex;
+    align-items: center;
+    padding: 4px;
+    border-radius: 6px;
+    background-color: rgba(255, 255, 255, 0.1);
+    cursor: pointer;
+    transition: 0.2s;
+    gap: 6px;
+    &:hover {
+      background-color: rgba(255, 255, 255, 0.2);
+      .removeSelectedUser {
+        color: var(--alert-color);
+      }
+    }
+    .removeSelectedUser {
+      transition: 0.2s;
+    }
+  }
+}
+.searchUserSuggestions {
+  position: absolute;
+  z-index: 111111111;
+  display: flex;
+  flex-direction: column;
+  max-width: 200px;
+  padding: 4px;
+  margin-top: 6px;
+  border: solid 1px rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  background: var(--message-floating-options-background-color);
+  user-select: none;
+  gap: 2px;
+  .searchUserSuggestionItem {
+    display: flex;
+    overflow: hidden;
+    padding: 6px;
+    border-radius: 6px;
+    cursor: pointer;
+    gap: 8px;
+    &:hover {
+      background-color: rgba(255, 255, 255, 0.05);
+    }
   }
 }
 

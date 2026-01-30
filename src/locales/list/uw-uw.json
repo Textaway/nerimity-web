@@ -371,7 +371,6 @@
         "developer": {
             "oauth2": {
                 "description": "Handle OAuth2y",
-                "title": "OAuth2y",
                 "generateLink": "Cweate A Winky"
             }
         }
@@ -441,9 +440,7 @@
     },
     "posts": {
         "deletePostModal": {
-            "message": "Suwe u wanna dewete dis post?",
-            "cancelButton": "RUN AWAYYY..",
-            "deleteButton": "Poof"
+            "message": "Suwe u wanna dewete dis post?"
         },
         "postWasDeleted": "Postie was poofed!!!",
         "someoneLikedYourPost": "<1>{{username}}</1> wiked youw post!",
@@ -618,14 +615,10 @@
         "confirmButton": "Poof~"
     },
     "colorPickerModal": {
-        "title": "Cowow Picky",
-        "done": "YEP!"
+        "title": "Cowow Picky"
     },
     "photoEditor": {
         "title": "Piccy Editow",
-        "cancel": "RUN AWAYYY..",
-        "edit": "DIS IS PURRFECT!",
-        "undo": "Un-doo (Ctww + Z)",
         "brush": "Bwushie",
         "erase": "Poof",
         "strokeWidth": "Stwokie width: {{width}}~",
@@ -634,8 +627,7 @@
         "desktopZoom": "Scwoww to zoomie"
     },
     "imageCropModal": {
-        "title": "Cwop Piccy",
-        "done": "DIS IS PURRFECT!"
+        "title": "Cwop Piccy"
     },
     "systemMessages": {
         "joinServer": {

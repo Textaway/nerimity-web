@@ -196,8 +196,8 @@
                 "publicDescription": "Rendre ce serveur public.",
                 "bumpServer": "Bump le Serveur",
                 "bumpServerDescription": "Bump this server to get to the top.",
-                "publishServerButton": "Publier le serveur",
-                "unpublishServerButton": "Annuler la publication du serveur",
+                "publishServerButton": "Publier",
+                "unpublishServerButton": "Annuler la publication",
                 "bumpButton": "Bump ({{count}})",
                 "descriptionLabel": "Description du serveur ({{current}}/{{max}})",
                 "bumpCooldown": "Vous devez attendre {{hours}} heures, {{minutes}} minutes et {{seconds}} secondes pour relancer ce serveur."
@@ -530,7 +530,11 @@
             "sendButton": "Envoyer un message",
             "timeTitle": "Changer le format de l'heure",
             "12HourFormatDescription": "Afficher l'heure au format 12 heures avec AM/PM.",
-            "24HourFormatDescription": "Afficher l'heure au format 24 heures."
+            "24HourFormatDescription": "Afficher l'heure au format 24 heures.",
+            "exportButton": "Exporter",
+            "importButton": "Importer",
+            "exportModal": "Thème copié dans le presse-papiers.",
+            "importModal": "Collez le thème ici :"
         },
         "window": {
             "downloadAppNotice": "Pour modifier ces paramètres, vous devez télécharger l'application de bureau Nerimity.",
@@ -566,8 +570,48 @@
         "developer": {
             "oauth2": {
                 "description": "Gérer OAuth2",
-                "title": "OAuth2",
-                "generateLink": "Générer un lien"
+                "generateLink": "Générer un lien",
+                "documentation": "Documentation OAuth2",
+                "clientId": "Identifiant client",
+                "clientSecret": "Secret client",
+                "secretRefreshed": "Clé secrète du client mise à jour.",
+                "secretCopied": "Clé secrète du client copiée dans le presse-papiers.",
+                "redirectUris": "URI de redirection",
+                "uri": "URI {{count}}",
+                "redirectUri": "rediriger URL"
+            },
+            "applicationsDescription": "Créer des bots Nerimity.",
+            "apiDocumentation": "Documentation API (incomplète)",
+            "addButton": "Ajouter une application",
+            "name": "Nom de la demande",
+            "appClientId": "ID de l'application/du client",
+            "botUser": "Utilisateur du robot",
+            "createBotUser": "Créer un nouvel utilisateur bot",
+            "editBotUser": "Modifier le robot",
+            "createBotUserButton": "Créer un utilisateur",
+            "refreshButton": "Rafraîchir",
+            "bot": {
+                "createInvite": "Créer un lien d'invitation",
+                "createLinkButton": "Créer un lien",
+                "token": "Jeton",
+                "tokenRefreshed": "Jeton actualisé.",
+                "tokenCopied": "Jeton copié dans le presse-papiers.",
+                "permissionsDescription": "Gérer les autorisations de ce lien.",
+                "publishBot": "Publier le robot",
+                "publishBotDescription": "Publiez votre bot sur la page Explorer pour que les autres utilisateurs puissent le trouver.",
+                "publishNotice": "La publication de votre bot le rendra disponible sur la page <1>explore</1>.",
+                "bumpBot": "Bump bot",
+                "bumpBotDescription": "Faites remonter ce bot en tête de liste",
+                "bumpBotCooldown": "Vous devez attendre {{hours}} heures, {{minutes}} minutes et {{seconds}} secondes pour relancer ce bot.",
+                "publicDescription": "Rendez ce bot public.",
+                "botDescription": "Description du bot ({{current}}/{{max}})"
+            },
+            "deleteApplication": {
+                "title": "Supprimer l'application",
+                "willNotGetDeleted": "Ce qui ne sera pas supprimé :",
+                "andMore": "• Et plus encore",
+                "willNotGetDeletedDescription": "Vous pouvez les supprimer manuellement avant de supprimer votre application.",
+                "deleteAppButton": "Supprimer cette application"
             }
         },
         "experiments": {
@@ -621,7 +665,9 @@
         "reportMessage": "Signaler le message",
         "markUnread": "Marquer comme non lu",
         "pinMessage": "Épingler",
-        "unpinMessage": "Détacher"
+        "unpinMessage": "Détacher",
+        "copyHTML": "Copier le HTML",
+        "copyMessageLink": "Copier le lien du message"
     },
     "profile": {
         "followButton": "Suivre",
@@ -664,8 +710,7 @@
     "posts": {
         "deletePostModal": {
             "message": "Êtes-vous sûr de vouloir supprimer cette publication?",
-            "cancelButton": "Annuler",
-            "deleteButton": "Supprimer"
+            "title": "Supprimer le post?"
         },
         "postWasDeleted": "Cette publication a été supprimé!",
         "someoneLikedYourPost": "<1>{{username}}</1> a aimé votre publication!",
@@ -677,7 +722,25 @@
         "createButton": "Créer",
         "someoneRepostedYourPost": "<1>{{username}}</1> a republié votre message !",
         "pollOptions": "Options de sondage",
-        "optionNumberPlaceholder": "Option {{number}}"
+        "optionNumberPlaceholder": "Option {{number}}",
+        "title": "Poste",
+        "viewCount": "Vues estimées",
+        "voteButton": "Voter",
+        "voteCount": "{{count}} vote(s)",
+        "copyPostButton": "Copier le post",
+        "sections": {
+            "replies": "Réponses ({{count}})",
+            "likes": "Likes ({{count}})",
+            "reposts": "Reposts ({{count}})"
+        },
+        "editPostModalTitle": "Modifier le post",
+        "sort": {
+            "latest": "Dernier",
+            "mostLiked7Days": "Les plus appréciés (7 jours)",
+            "mostLiked30Days": "Les plus appréciés (30 jours)",
+            "mostLikedAllTime": "Les plus appréciés (de tous les temps)"
+        },
+        "postWarning": "Les contenus faisant l'apologie de l'automutilation sont interdits, des mesures seront prises à l'encontre du compte."
     },
     "systemMessages": {
         "joinServer": {
@@ -784,7 +847,8 @@
         "spoiler": "Spoiler",
         "timestamp": "Horodatage",
         "html": "Mode HTML",
-        "emojiPicker": "Sélecteur d'émoji"
+        "emojiPicker": "Sélecteur d'émoji",
+        "checkbox": "Case à cocher"
     },
     "typing": {
         "single": "<1>{{username}}</1> est en train d'écrire…",
@@ -816,10 +880,10 @@
         },
         "kitty": {
             "name": "Chaton",
-            "blueDescription": "Chat aux oreilles bleues",
-            "whiteDescription": "Chat aux oreilles blanches",
-            "maidDescription": "Oreilles de chat femme de ménage",
-            "purpleDescription": "Chat aux oreilles violettes"
+            "blueDescription": "Oreilles de chat arctique",
+            "whiteDescription": "Oreilles de chat calico",
+            "maidDescription": "Oreilles de chaton bonne",
+            "purpleDescription": "Oreilles de chat du Cheshire"
         },
         "founder": {
             "name": "Fondateur",
@@ -838,7 +902,7 @@
         },
         "bot": {
             "name": "Utilisateur de robot",
-            "description": "Utilisateur de robot"
+            "description": "Cet utilisateur est un bot"
         },
         "credit": {
             "avatarBorder": "Bordure d'avatar par {{author}} sur {{platform}}",
@@ -846,8 +910,8 @@
         },
         "foxy": {
             "name": "Rusé",
-            "foxyGoldDescription": "Renard aux oreilles d'or",
-            "foxyBrownDescription": "Renard à oreilles brunes"
+            "foxyGoldDescription": "Oreilles de renard dorées",
+            "foxyBrownDescription": "Oreilles de renard brunes"
         },
         "admin": {
             "name": "Administrateur",
@@ -859,13 +923,13 @@
         },
         "bunny": {
             "name": "Lapin",
-            "bunnyDescription": "Lapin aux oreilles noires",
-            "maidDescription": "Lapin oreilles de bonne"
+            "bunnyDescription": "Oreilles de lapin tombantes",
+            "maidDescription": "Oreilles de lapin bonne"
         },
         "dog": {
             "name": "Chienchien",
-            "dogDescription": "Oreilles de chien marron",
-            "shibaDescription": "Chien Shiba"
+            "dogDescription": "Bonnes oreilles de chiot",
+            "shibaDescription": "Chien Shiba Inu"
         },
         "wolf": {
             "name": "Loup",
@@ -873,14 +937,14 @@
         },
         "goat": {
             "name": "Chèvre",
-            "goatDescription": "Oreilles de chèvre blanches",
+            "goatDescription": "Oreilles de chèvre kawaii",
             "goatHornDescription": "Cornes de chèvre"
         },
         "deer": {
             "name": "Cerf",
-            "deerDescription": "Cornes d'oreilles de cerf",
-            "deerDarkDescription": "Cornes d'oreilles de cerf foncées",
-            "deerWhiteDescription": "Oreilles de cerf blanches"
+            "deerDescription": "Bois de cerf mignons",
+            "deerDarkDescription": "Bois de cerf emo",
+            "deerWhiteDescription": "Cerf rose Kawaii"
         }
     },
     "botInvite": {
@@ -960,7 +1024,8 @@
         "translationError": "Impossible de traduire ce message.",
         "translation": {
             "title": "Traduction"
-        }
+        },
+        "imageMessage": "Message illustré"
     },
     "messageView": {
         "flaggedServer": {
@@ -1040,7 +1105,7 @@
             "noMentions": "Aucune mention"
         },
         "pins": {
-            "noPins": "Aucune épingles"
+            "noPins": "Aucun message épinglé"
         },
         "jump": "Sauter",
         "voice": {
@@ -1087,14 +1152,10 @@
         "confirmButton": "Supprimer"
     },
     "colorPickerModal": {
-        "title": "Sélecteur de couleurs",
-        "done": "Fait"
+        "title": "Sélecteur de couleurs"
     },
     "photoEditor": {
         "title": "Éditeur de photos",
-        "cancel": "Annuler",
-        "edit": "Modifier",
-        "undo": "Annuler (Ctrl + Z)",
         "brush": "Brosse",
         "erase": "Effacer",
         "strokeWidth": "Largeur du trait : {{width}}",
@@ -1103,8 +1164,7 @@
         "desktopZoom": "Faites défiler pour Zoomer"
     },
     "imageCropModal": {
-        "title": "Recadrer l'image",
-        "done": "Fait"
+        "title": "Recadrer l'image"
     },
     "oauth2": {
         "AuthorizeButton": "Autoriser",
@@ -1117,7 +1177,6 @@
     },
     "general": {
         "nothingSelected": "Rien de sélectionné",
-        "selectItem": "Sélectionner un article",
         "searchPlaceholder": "Rechercher",
         "backButton": "Retour",
         "cancelButton": "Annuler",
@@ -1147,7 +1206,7 @@
     },
     "nicknameChangeModal": {
         "title": "Mettre à jour le profil du serveur",
-        "description": "Tous les membres de ce serveur verront votre pseudo.",
+        "description": "Ce pseudo sera visible par tous les utilisateurs de ce serveur.",
         "inputLabel": "Surnom"
     },
     "transferOwnershipModal": {

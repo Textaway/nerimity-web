@@ -76,12 +76,13 @@ import { pushMessageNotification } from "@/components/in-app-notification-previe
 import { fetchTranslation } from "@/common/GoogleTranslate";
 import { messagesPreloader } from "@/common/createPreloader";
 import { unzipJson } from "@/common/zip";
+import { rightDrawerMode } from "@/common/localStorage";
 
 const DeleteMessageModal = lazy(
-  () => import("../message-delete-modal/MessageDeleteModal")
+  () => import("../message-delete-modal/MessageDeleteModal"),
 );
 const PinConfirmModal = lazy(
-  () => import("../pin-confirm-modal/PinConfirmModal")
+  () => import("../pin-confirm-modal/PinConfirmModal"),
 );
 
 export const MessageLogArea = (props: {
@@ -91,6 +92,8 @@ export const MessageLogArea = (props: {
   const [searchParams, setSearchParams] = useSearchParams<{
     messageId?: string;
   }>();
+
+  const [getRightDrawerMode] = rightDrawerMode;
 
   let messageLogElement: undefined | HTMLDivElement;
 
@@ -108,7 +111,7 @@ export const MessageLogArea = (props: {
   const { channels, messages, account, channelProperties, servers } =
     useStore();
   const channelMessages = createMemo(() =>
-    messages.getMessagesByChannelId(params.channelId!)
+    messages.getMessagesByChannelId(params.channelId!),
   );
   const [unreadMarker, setUnreadMarker] = createStore<{
     lastSeenAt: number | null;
@@ -131,7 +134,7 @@ export const MessageLogArea = (props: {
   const scrollTracker = createScrollTracker(
     props.mainPaneEl,
     topSkeletonHeight,
-    bottomSkeletonHeight
+    bottomSkeletonHeight,
   );
 
   const channel = createMemo(() => channels.get(params.channelId!));
@@ -141,7 +144,7 @@ export const MessageLogArea = (props: {
   const scrollToMessageListener = useScrollToMessageListener();
   const scrollPositionRetainer = useScrollPositionRetainer(
     () => props.mainPaneEl!,
-    () => messageLogElement!
+    () => messageLogElement!,
   );
 
   const isStale = () => properties()?.stale;
@@ -160,7 +163,7 @@ export const MessageLogArea = (props: {
         setAreMessagesLoading(false);
         channelProperties.updateStale(params.channelId, false);
       }
-    })
+    }),
   );
 
   scrollToMessageListener(async (event) => {
@@ -168,13 +171,13 @@ export const MessageLogArea = (props: {
     drawer?.goToMain();
     setAreMessagesLoading(true);
     let messageEl = messageLogElement?.querySelector(
-      `#message-${event.messageId}`
+      `#message-${event.messageId}`,
     ) as HTMLDivElement;
     if (!messageEl) {
       await messages.loadAroundAndStoreMessages(channel().id, event.messageId);
 
       messageEl = messageLogElement?.querySelector(
-        `#message-${event.messageId}`
+        `#message-${event.messageId}`,
       ) as HTMLDivElement;
       setTimeout(() => {
         scrollTracker.setLoadMoreBottom(false);
@@ -216,17 +219,17 @@ export const MessageLogArea = (props: {
         const floatingOptionsHovered = mutations.find((e) => {
           if (e.type !== "childList") return;
           const addedFloating = [...e.addedNodes].find(
-            (e) => e instanceof HTMLElement && e.closest(".floatOptions")
+            (e) => e instanceof HTMLElement && e.closest(".floatOptions"),
           );
           const removedFloating = [...e.removedNodes].find(
-            (e) => e instanceof HTMLElement && e.closest(".floatOptions")
+            (e) => e instanceof HTMLElement && e.closest(".floatOptions"),
           );
           return addedFloating || removedFloating;
         });
         if (floatingOptionsHovered) return;
         props.mainPaneEl.scrollTop = props.mainPaneEl.scrollHeight;
       }
-    }
+    },
   );
 
   createRenderEffect(
@@ -234,14 +237,14 @@ export const MessageLogArea = (props: {
       if (scrollTracker.scrolledBottom()) {
         props.mainPaneEl.scrollTop = props.mainPaneEl.scrollHeight;
       }
-    })
+    }),
   );
 
   const updateUnreadMarker = (ignoreFocus = false) => {
     if (!ignoreFocus && hasFocus()) return;
     const lastSeenAt = channel()?.lastSeen || -1;
     const message = channelMessages()?.find(
-      (m) => m.createdAt - lastSeenAt >= 0
+      (m) => m.createdAt - lastSeenAt >= 0,
     );
     setUnreadMarker({
       lastSeenAt,
@@ -261,8 +264,8 @@ export const MessageLogArea = (props: {
         if (!prevLastSeen) return;
         if (nowLastSeen >= prevLastSeen) return;
         updateUnreadMarker(true);
-      }
-    )
+      },
+    ),
   );
   createRenderEffect(
     on(
@@ -272,8 +275,8 @@ export const MessageLogArea = (props: {
         updateUnreadMarker(prevLength === undefined);
         if (prevLength === undefined) return;
         dismissNotification();
-      }
-    )
+      },
+    ),
   );
 
   createEffect(
@@ -282,8 +285,8 @@ export const MessageLogArea = (props: {
       () => {
         dismissNotification();
       },
-      { defer: true }
-    )
+      { defer: true },
+    ),
   );
 
   const dismissNotification = () => {
@@ -330,7 +333,7 @@ export const MessageLogArea = (props: {
   // }, 5000);
 
   const { height: textAreaHeight } = useResizeObserver(
-    () => props.textAreaEl?.parentElement?.parentElement
+    () => props.textAreaEl?.parentElement?.parentElement,
   );
 
   createEffect(
@@ -338,7 +341,7 @@ export const MessageLogArea = (props: {
       if (scrollTracker.scrolledBottom()) {
         props.mainPaneEl.scrollTop = props.mainPaneEl.scrollHeight;
       }
-    })
+    }),
   );
 
   createEffect(
@@ -348,8 +351,8 @@ export const MessageLogArea = (props: {
         if (scrollTracker.scrolledBottom()) {
           props.mainPaneEl.scrollTop = props.mainPaneEl.scrollHeight;
         }
-      }
-    )
+      },
+    ),
   );
 
   createEffect(
@@ -370,7 +373,7 @@ export const MessageLogArea = (props: {
         if (searchParams.messageId) return;
         setAreMessagesLoading(false);
       }, 100);
-    })
+    }),
   );
 
   createEffect(
@@ -378,9 +381,9 @@ export const MessageLogArea = (props: {
       dismissNotification();
       channelProperties.setScrolledBottom(
         params.channelId,
-        scrollTracker.scrolledBottom()
+        scrollTracker.scrolledBottom(),
       );
-    })
+    }),
   );
 
   createEffect(
@@ -395,8 +398,8 @@ export const MessageLogArea = (props: {
           return;
         }
       },
-      { defer: true }
-    )
+      { defer: true },
+    ),
   );
 
   onMount(async () => {
@@ -420,7 +423,7 @@ export const MessageLogArea = (props: {
         }
 
         await fetchMessages();
-      })
+      }),
     );
 
     const channelId = params.channelId;
@@ -436,7 +439,7 @@ export const MessageLogArea = (props: {
       batch(() => {
         channelProperties.setScrolledBottom(
           channelId,
-          scrollTracker.scrolledBottom()
+          scrollTracker.scrolledBottom(),
         );
         channelProperties.setScrollTop(channelId, scrollTracker.scrollTop());
       });
@@ -503,7 +506,7 @@ export const MessageLogArea = (props: {
           scrollPositionRetainer.load();
           channelProperties.setMoreBottomToLoad(
             params.channelId,
-            channelMessages()?.length! >= env.MESSAGE_LIMIT
+            channelMessages()?.length! >= env.MESSAGE_LIMIT,
           );
           channelProperties.setMoreTopToLoad(params.channelId, hasMore);
           scrollTracker.forceUpdate();
@@ -512,10 +515,10 @@ export const MessageLogArea = (props: {
         messages.loadMoreTopAndStoreMessages(
           params.channelId,
           beforeSet,
-          afterSet
+          afterSet,
         );
-      }
-    )
+      },
+    ),
   );
 
   // Load more bottom when scrolled to the bottom
@@ -538,7 +541,7 @@ export const MessageLogArea = (props: {
           scrollPositionRetainer.load();
           channelProperties.setMoreTopToLoad(
             params.channelId,
-            channelMessages()?.length! >= env.MESSAGE_LIMIT
+            channelMessages()?.length! >= env.MESSAGE_LIMIT,
           );
           channelProperties.setMoreBottomToLoad(params.channelId, hasMore);
           scrollTracker.forceUpdate();
@@ -547,10 +550,10 @@ export const MessageLogArea = (props: {
         messages.loadMoreBottomAndStoreMessages(
           params.channelId,
           beforeSet,
-          afterSet
+          afterSet,
         );
-      }
-    )
+      },
+    ),
   );
 
   const removeUnreadMarker = () => {
@@ -588,7 +591,7 @@ export const MessageLogArea = (props: {
       `[q:${message.id}]`,
       props.textAreaEl!.selectionStart,
       props.textAreaEl.selectionEnd,
-      "end"
+      "end",
     );
     channelProperties.updateContent(params.channelId, props.textAreaEl.value);
   };
@@ -623,7 +626,7 @@ export const MessageLogArea = (props: {
   };
 
   const [translateMessageIds, setTranslateMessageIds] = createSignal<string[]>(
-    []
+    [],
   );
   const translateMessage = async () => {
     const messageId = messageContextDetails()?.message.id;
@@ -691,6 +694,7 @@ export const MessageLogArea = (props: {
               <UnreadMarker onClick={removeUnreadMarker} />
             </Show>
             <MessageItem
+              allowSwipeActions={getRightDrawerMode() === "HEADER_CLICK"}
               showNewDayMarker
               isEditing={
                 message.id === properties()?.editMessageId ||
@@ -744,7 +748,7 @@ const MessageSkeleton = () => {
 
 const useScrollPositionRetainer = (
   scrollElement: () => HTMLDivElement,
-  logElement: () => HTMLDivElement
+  logElement: () => HTMLDivElement,
 ) => {
   let el: HTMLDivElement | undefined;
 
@@ -777,7 +781,7 @@ const useScrollPositionRetainer = (
 function createScrollTracker(
   scrollElement: HTMLElement,
   topSkeletonHeight: () => number,
-  bottomSkeletonHeight: () => number
+  bottomSkeletonHeight: () => number,
 ) {
   const [loadMoreTop, setLoadMoreTop] = createSignal(false);
   const [loadMoreBottom, setLoadMoreBottom] = createSignal(true);
@@ -922,44 +926,36 @@ function MessageContextMenu(props: MessageContextMenuProps) {
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   function renderHtml(nodeOrNodes: any) {
-    // --- Internal helper function to render a single node (Recursive core logic) ---
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const renderSingleNode = (node: any) => {
-      // 1. Build the opening tag with attributes
       let html = `<${node.tag}`;
       if (node.attributes) {
         for (const key in node.attributes) {
           if (Object.prototype.hasOwnProperty.call(node.attributes, key)) {
-            // Basic sanitization for attributes
             const encodedValue = node.attributes[key].replace(/"/g, "&quot;");
             html += ` ${key}="${encodedValue}"`;
           }
         }
       }
-      html += ">"; // 2. Process content (recursive step)
+      html += ">";
 
       for (const contentItem of node.content) {
         if (typeof contentItem === "string") {
-          // NOTE: For security, a real-world renderer should escape content here
           html += contentItem;
         } else {
-          // Recursively call the single-node renderer
           html += renderSingleNode(contentItem);
         }
-      } // 3. Append the closing tag
+      }
 
       html += `</${node.tag}>`;
       return html;
-    }; // --- Main Logic: Check the input type ---
+    };
 
     if (typeof nodeOrNodes === "string") {
-      // 🆕 Case 0: Input is a string (plaintext content)
       return nodeOrNodes;
     } else if (Array.isArray(nodeOrNodes)) {
-      // Case 1: Input is an array
       return nodeOrNodes.map(renderSingleNode).join("\n");
     } else {
-      // Case 2: Input is a single node (object)
       return renderSingleNode(nodeOrNodes);
     }
   }
@@ -1050,16 +1046,16 @@ function MessageContextMenu(props: MessageContextMenuProps) {
         { separator: true },
         {
           icon: "link",
-          label: t("general.copyLink")!,
+          label: t("messageContextMenu.copyMessageLink")!,
           onClick: () => {
             const channel = channels.get(props.message.channelId!);
             if (channel?.serverId) {
               return copyToClipboard(
-                `${env.APP_URL}/app/servers/${channel.serverId}/${channel.id}?messageId=${props.message.id}`
+                `${env.APP_URL}/app/servers/${channel.serverId}/${channel.id}?messageId=${props.message.id}`,
               );
             }
             return copyToClipboard(
-              `${env.APP_URL}/app/inbox/${channel?.id}?messageId=${props.message.id}`
+              `${env.APP_URL}/app/inbox/${channel?.id}?messageId=${props.message.id}`,
             );
           },
         },
@@ -1080,7 +1076,7 @@ function MessageContextMenu(props: MessageContextMenuProps) {
                 label: t("messageContextMenu.copyHTML"),
                 onClick: () =>
                   copyToClipboard(
-                    renderHtml(unzipJson(props.message.htmlEmbed!))
+                    renderHtml(unzipJson(props.message.htmlEmbed!)),
                   ),
               },
             ]
@@ -1112,7 +1108,7 @@ const ViewReactionsModal = (props: { close: () => void; message: Message }) => {
         limit: 50,
       });
       setReactedUsers(reactedUsers);
-    })
+    }),
   );
 
   return (

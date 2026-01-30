@@ -6,6 +6,7 @@
   margin-right: 8px;
   margin-left: 4px;
   border-radius: 10px;
+  color: var(--text-color);
 }
 .profilePaneInner {
   display: flex;
@@ -99,6 +100,7 @@
   line-height: 1;
 
   line-height: var(--lh);
+  letter-spacing: var(--ls);
   font-family: var(--font);
   font-size: calc(20px * var(--scale, 1));
 }
@@ -259,9 +261,13 @@
   flex-direction: column;
 
   padding: 6px;
-  border-radius: 8px;
 
+  padding-top: 0;
+  border-radius: 8px;
   gap: 6px;
+  &.hasImage {
+    padding-top: 6px;
+  }
   .backgroundImage {
     position: absolute;
     z-index: -1;
@@ -276,6 +282,8 @@
     flex: 1;
     flex-direction: column;
     margin-right: 2px;
+    margin-bottom: 4px;
+    margin-left: 2px;
   }
 }
 .activityImg {

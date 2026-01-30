@@ -116,7 +116,7 @@ function NewPostArea(props: {
   const [content, setContent] = createSignal("");
   const { isPortalOpened } = useCustomPortal();
   const [attachedFile, setAttachedFile] = createSignal<File | undefined>(
-    undefined
+    undefined,
   );
   const [fileBrowserRef, setFileBrowserRef] = createSignal<
     undefined | FileBrowserRef
@@ -203,7 +203,7 @@ function NewPostArea(props: {
       `:${shortcode}: `,
       textAreaEl()!.selectionStart,
       textAreaEl()!.selectionEnd,
-      "end"
+      "end",
     );
     setContent(textAreaEl()!.value);
     if (!shiftMode) setShowEmojiPicker(false);
@@ -211,10 +211,10 @@ function NewPostArea(props: {
   const gifPicked = (gif: TenorImage) => {
     textAreaEl()!.focus();
     textAreaEl()!.setRangeText(
-      `${gif.url} `,
+      `${gif.gifUrl} `,
       textAreaEl()!.selectionStart,
       textAreaEl()!.selectionEnd,
-      "end"
+      "end",
     );
     setContent(textAreaEl()!.value);
     setShowEmojiPicker(false);
@@ -262,7 +262,7 @@ function NewPostArea(props: {
                 border: transparent;
               }
             `,
-            "newPostInput"
+            "newPostInput",
           )}
           ref={setTextAreaEl}
           placeholder={
@@ -329,7 +329,7 @@ function NewPostArea(props: {
               css`
                 width: 20px;
                 height: 20px;
-              `
+              `,
             )}
             iconSize={16}
             onClick={() => setShowEmojiPicker(!showEmojiPicker())}
@@ -364,9 +364,7 @@ function NewPostArea(props: {
           class={css`
             margin-top: 6px;
           `}
-          description={
-            "Self-harm content is not allowed, account action will be taken."
-          }
+          description={t("posts.postWarning")}
         />
       </Show>
     </NewPostOuterContainer>
@@ -386,7 +384,7 @@ function Suggestions(props: {
   const onClick = (e: any) => {
     setIsFocus(
       e.target.closest(".newPostInput") ===
-        props.textArea?.parentElement?.parentElement
+        props.textArea?.parentElement?.parentElement,
     );
   };
 
@@ -432,7 +430,7 @@ function Suggestions(props: {
 }
 
 function getCursorPositionPx(
-  textarea: HTMLTextAreaElement
+  textarea: HTMLTextAreaElement,
 ): { x: number; y: number } | null {
   if (!textarea) {
     return null; // Handle cases where the textarea is not provided or doesn't exist
@@ -499,14 +497,14 @@ function SuggestUsers(props: {
       props.search,
       `${user?.username}:${user?.tag} `,
       props.content,
-      props.updateContent
+      props.updateContent,
     );
   };
 
   const [current, , , setCurrent] = useSelectedSuggestion(
     () => users().length,
     () => props.textAreaEl!,
-    (i) => onUserClick(users()[i])
+    (i) => onUserClick(users()[i]),
   );
 
   let timeoutId: number | undefined;
@@ -539,8 +537,8 @@ function SuggestUsers(props: {
       () => {
         window.clearTimeout(timeoutId);
         timeoutId = window.setTimeout(fetchAndSetUsers, 500);
-      }
-    )
+      },
+    ),
   );
 
   return (
@@ -585,13 +583,13 @@ function appendText(
   query: string,
   name: string,
   content: string,
-  updateContent: (content: string) => void
+  updateContent: (content: string) => void,
 ) {
   const cursorPosition = textArea.selectionStart!;
   const removeCurrentQuery = removeByIndex(
     content,
     cursorPosition - query.length,
-    query.length
+    query.length,
   );
   const result =
     removeCurrentQuery.slice(0, cursorPosition - query.length) +
@@ -918,7 +916,7 @@ export function PostsArea(props: {
       setLoading(true);
       const newPosts = await posts.fetchUserPosts(
         props.userId!,
-        props.showReplies
+        props.showReplies,
       );
       setLastFetchCount(newPosts?.length || 0);
       setLoading(false);
@@ -943,7 +941,7 @@ export function PostsArea(props: {
     setLoading(true);
     const newPosts = await posts.fetchDiscover(
       sortValue === "latest" ? undefined : sortValue,
-      abortController.signal
+      abortController.signal,
     );
     setLastFetchCount(newPosts?.length || 0);
     setLoading(false);
@@ -962,7 +960,7 @@ export function PostsArea(props: {
       fetchFeed();
       fetchDiscover();
       fetchReplies();
-    })
+    }),
   );
 
   const hasMorePosts = () => lastFetchCount() >= 30;
@@ -980,7 +978,7 @@ export function PostsArea(props: {
     setLoading(true);
     const newPosts = await posts.fetchMoreUserPosts(
       props.userId!,
-      props.showReplies
+      props.showReplies,
     );
     setLastFetchCount(newPosts?.length || 0);
     setLoading(false);
@@ -998,7 +996,7 @@ export function PostsArea(props: {
     setLoading(true);
     const sortValue = sort();
     const newPosts = await posts.fetchMoreDiscover(
-      sortValue === "latest" ? undefined : sortValue
+      sortValue === "latest" ? undefined : sortValue,
     );
     setLastFetchCount(newPosts?.length || 0);
     setLoading(false);
@@ -1050,10 +1048,10 @@ export function PostsArea(props: {
           onChange={(v) => setSort(v.id)}
           selectedId={sort() || "0"}
           items={[
-            { id: "latest", label: "Latest" },
-            { id: "mostLiked7Days", label: "Most Liked (7 days)" },
-            { id: "mostLiked30days", label: "Most Liked (30 days)" },
-            { id: "mostLikedAllTime", label: "Most Liked (All time)" },
+            { id: "latest", label: t("posts.sort.latest") },
+            { id: "mostLiked7Days", label: t("posts.sort.mostLiked7Days") },
+            { id: "mostLiked30days", label: t("posts.sort.mostLiked30Days") },
+            { id: "mostLikedAllTime", label: t("posts.sort.mostLikedAllTime") },
           ]}
         />
       </Show>
@@ -1106,11 +1104,11 @@ function partInViewport(elem: HTMLElement) {
   const y = elem.getBoundingClientRect().top;
   const ww = Math.max(
     document.documentElement.clientWidth,
-    window.innerWidth || 0
+    window.innerWidth || 0,
   );
   const hw = Math.max(
     document.documentElement.clientHeight,
-    window.innerHeight || 0
+    window.innerHeight || 0,
   );
   const w = elem.clientWidth;
   const h = elem.clientHeight;
@@ -1451,7 +1449,7 @@ function PostNotification(props: { notification: RawPostNotification }) {
 
 export function PostNotificationsArea(props: { style?: JSX.CSSProperties }) {
   const [notifications, setNotifications] = createSignal<RawPostNotification[]>(
-    []
+    [],
   );
 
   onMount(async () => {
@@ -1492,8 +1490,8 @@ export function ViewPostModal(props: { close(): void }) {
         setSelectedTab("comments");
         if (!postId) return;
         getPost(postId);
-      }
-    )
+      },
+    ),
   );
 
   const getPost = async (postId: string) => {
@@ -1510,7 +1508,7 @@ export function ViewPostModal(props: { close(): void }) {
   return (
     <LegacyModal
       close={onClose}
-      title="Post"
+      title={t("posts.title")}
       class={css`
         display: flex;
         flex-direction: column;
@@ -1521,7 +1519,7 @@ export function ViewPostModal(props: { close(): void }) {
     >
       <MetaTitle>
         {!post() || post()?.deleted
-          ? "Post"
+          ? t("posts.title")
           : `${post()?.createdBy.username}: ${post()?.content}`}
       </MetaTitle>
       <FlexColumn style={{ overflow: "auto", height: "100%" }}>
@@ -1551,7 +1549,7 @@ export function ViewPostModal(props: { close(): void }) {
                       : "rgba(255,255,255,0.6)"
                   }
                 >
-                  {`Replies (${post()?._count?.comments})`}
+                  {t("posts.sections.replies", { count: `${post()?._count?.comments}` })}
                 </Text>
               </ItemContainer>
               <ItemContainer
@@ -1569,7 +1567,7 @@ export function ViewPostModal(props: { close(): void }) {
                       : "rgba(255,255,255,0.6)"
                   }
                 >
-                  {`Likes (${post()?._count?.likedBy})`}
+                  {t("posts.sections.likes", { count: `${post()?._count?.likedBy}` })}
                 </Text>
               </ItemContainer>
               <ItemContainer
@@ -1587,7 +1585,7 @@ export function ViewPostModal(props: { close(): void }) {
                       : "rgba(255,255,255,0.6)"
                   }
                 >
-                  {`Reposts (${post()?._count?.reposts})`}
+                  {t("posts.sections.reposts", { count: `${post()?._count?.reposts}` })}
                 </Text>
               </ItemContainer>
             </Show>
@@ -1659,7 +1657,7 @@ export function DeletePostModal(props: { post: Post; close: () => void }) {
       close={props.close}
       class={deletePostModalStyles}
     >
-      <Modal.Header title="Delete Post?" icon="delete" alert />
+      <Modal.Header title={t("posts.deletePostModal.title")} icon="delete" alert />
       <Modal.Body class={deletePostBodyContainerStyles}>
         <Text size={14}>{t("posts.deletePostModal.message")}</Text>
         <PostItem
@@ -1670,13 +1668,13 @@ export function DeletePostModal(props: { post: Post; close: () => void }) {
       </Modal.Body>
       <Modal.Footer>
         <Modal.Button
-          label="Don't Delete"
+          label={t("general.cancelButton")}
           onClick={props.close}
           iconName="close"
         />
         <Modal.Button
           primary
-          label="Delete"
+          label={t("general.deleteButton")}
           onClick={onDeleteClick}
           iconName="delete"
           color="var(--alert-color)"
@@ -1715,7 +1713,7 @@ export function EditPostModal(props: { post: Post; close: () => void }) {
       desktopMaxWidth={600}
       desktopMinWidth={400}
     >
-      <Modal.Header title="Edit Post" icon="edit" />
+      <Modal.Header title={t("posts.editPostModalTitle")} icon="edit" />
       <Modal.Body>
         <AdvancedMarkupOptions
           showGifPicker
@@ -1749,13 +1747,13 @@ export function EditPostModal(props: { post: Post; close: () => void }) {
       </Modal.Body>
       <Modal.Footer>
         <Modal.Button
-          label="Don't Edit"
+          label={t("general.cancelButton")}
           onClick={props.close}
           iconName="close"
           alert
         />
         <Modal.Button
-          label="Edit"
+          label={t("general.editButton")}
           onClick={onEditClick}
           primary
           iconName="edit"

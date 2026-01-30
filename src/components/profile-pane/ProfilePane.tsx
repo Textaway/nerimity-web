@@ -72,7 +72,7 @@ import { MetaTitle } from "@/common/MetaTitle";
 import average from "@/common/chromaJS";
 import { useCustomScrollbar } from "../custom-scrollbar/CustomScrollbar";
 import { emojiToUrl } from "@/common/emojiToUrl";
-import { currentTheme } from "@/common/themes";
+import { currentTheme, DefaultTheme, defaultThemeCSSVars } from "@/common/themes";
 import DeleteConfirmModal from "../ui/delete-confirm-modal/DeleteConfirmModal";
 import { getActivityType } from "@/common/activityType";
 import { Fonts, getFont } from "@/common/fonts";
@@ -159,14 +159,14 @@ export default function ProfilePane() {
   const paneBgColor = createMemo(() => {
     try {
       return average([
-        userDetails()?.profile?.bgColorOne! || currentTheme()["pane-color"],
-        userDetails()?.profile?.bgColorTwo! || currentTheme()["pane-color"],
+        userDetails()?.profile?.bgColorOne! || DefaultTheme["pane-color"],
+        userDetails()?.profile?.bgColorTwo! || DefaultTheme["pane-color"],
       ])
         .luminance(0.01)
         .alpha(0.9)
         .hex();
     } catch {
-      return currentTheme()["pane-color"];
+      return DefaultTheme["pane-color"];
     }
   });
 
@@ -192,8 +192,8 @@ export default function ProfilePane() {
         setPaneBackgroundColor(`
           linear-gradient(
             180deg,
-            ${colors()?.bg?.[0] || currentTheme()["pane-color"]},
-            ${colors()?.bg?.[1] || currentTheme()["pane-color"]}
+            ${colors()?.bg?.[0] || DefaultTheme["pane-color"]},
+            ${colors()?.bg?.[1] || DefaultTheme["pane-color"]}
           )
         `);
       }
@@ -209,6 +209,8 @@ export default function ProfilePane() {
 
   const font = createMemo(() => getFont(userDetails()?.profile?.font || 0));
 
+
+
   return (
     <>
       <MetaTitle>{!user() ? "Profile" : user()?.username}</MetaTitle>
@@ -220,6 +222,7 @@ export default function ProfilePane() {
           )}
           style={{
             "max-width": `${paneWidth()}px`,
+            ...defaultThemeCSSVars
           }}
         >
           <div class={styles.profilePaneInner}>
@@ -277,6 +280,7 @@ export default function ProfilePane() {
                           style={{
                             "--font": `'${font()?.name}'`,
                             "--lh": font()?.lineHeight,
+                            "--ls": font()?.letterSpacing,
                             "--scale": font()?.scale,
                           }}
                         >
@@ -915,16 +919,14 @@ const UserActivity = (props: {
           </span>
         </FlexRow>
 
-        <Show when={activity()?.imgSrc || activity()?.emoji}>
-          <div class={styles.richPresence}>
-            <Show when={imgSrc()}>
-              <div
-                class={styles.backgroundImage}
-                style={{
-                  "background-image": `url(${imgSrc()})`,
-                }}
-              />
-            </Show>
+        <div class={cn(styles.richPresence, imgSrc() && styles.hasImage)}>
+          <Show when={imgSrc()}>
+            <div
+              class={styles.backgroundImage}
+              style={{
+                "background-image": `url(${imgSrc()})`,
+              }}
+            />
             <img
               src={imgSrc()}
               class={styles.activityImg}
@@ -932,7 +934,9 @@ const UserActivity = (props: {
                 [styles.videoActivityImg!]: isVideo() || isLiveStream(),
               }}
             />
-            <div class={styles.richInfo}>
+          </Show>
+          <div class={styles.richInfo}>
+            <Show when={activity()?.title || (activity()?.name && imgSrc())}>
               <Text
                 size={13}
                 opacity={0.9}
@@ -942,48 +946,33 @@ const UserActivity = (props: {
               >
                 {activity()?.title || activity()?.name}
               </Text>
-
+            </Show>
+            <Show when={activity()?.subtitle}>
               <Text size={13} opacity={0.6}>
                 {activity()?.subtitle}
               </Text>
-              <Show when={!isMusic() && !isVideo()}>
-                <Text
-                  class={styles.playedFor}
-                  size={13}
-                  opacity={0.6}
-                  title={formatTimestamp(activity()?.startedAt || 0)}
-                >
-                  {playedFor()}
-                </Text>
-              </Show>
-              <Show when={isMusic() || isVideo()}>
-                <RichProgressBar
-                  updatedAt={activity()?.updatedAt}
-                  speed={activity()?.speed}
-                  primaryColor={props.color}
-                  startedAt={activity()?.startedAt!}
-                  endsAt={activity()?.endsAt!}
-                />
-              </Show>
-            </div>
+            </Show>
+            <Show when={!isMusic() && !isVideo()}>
+              <Text
+                class={styles.playedFor}
+                size={13}
+                opacity={0.6}
+                title={formatTimestamp(activity()?.startedAt || 0)}
+              >
+                For {playedFor()}
+              </Text>
+            </Show>
+            <Show when={isMusic() || isVideo()}>
+              <RichProgressBar
+                updatedAt={activity()?.updatedAt}
+                speed={activity()?.speed}
+                primaryColor={props.color}
+                startedAt={activity()?.startedAt!}
+                endsAt={activity()?.endsAt!}
+              />
+            </Show>
           </div>
-        </Show>
-
-        <Show when={!activity()?.imgSrc && !activity()?.emoji}>
-          <Text
-            class={styles.playedFor}
-            style={{
-              "margin-left": "8px",
-              "margin-top": "-4px",
-              "margin-bottom": "8px",
-            }}
-            title={formatTimestamp(activity()?.startedAt || 0)}
-            size={14}
-            opacity={0.6}
-          >
-            For {playedFor()}
-          </Text>
-        </Show>
+        </div>
       </FlexColumn>
     </Show>
   );

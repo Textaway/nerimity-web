@@ -12,7 +12,7 @@
         },
         "leaveServer": "<User/><2> выйшаў з сэрвэра.</2>",
         "kickUser": "<User/><2> быў выгнаны.</2>",
-        "banUser": "<User/><2> быў заблякаваны.</2>",
+        "banUser": "<User/><2> быў забанены.</2>",
         "callStarted": "<User/><2> пачаў выклік.</2>",
         "bumpServer": "<User/><2> усхваліў сэрвэр.</2>",
         "pinnedMessage": "<User/><2> замацаваў паведамленьне.</2>",
@@ -93,7 +93,7 @@
         "activeUsers": "Зараз у сетцы",
         "noActiveUsers": "Няма актыўных карыстачоў",
         "servers": "Сэрвэры",
-        "posts": "Публікацыйі",
+        "posts": "Допісы",
         "feed": "Стужка",
         "discover": "Дасьледваць",
         "notifications": "Абвесткі"
@@ -163,7 +163,7 @@
             "noticeMessage": "Бота можна ўсхваліць раз у {{hours}} гадзін. Усе ўсхваленьні скідваюцца кожны {{date}}.",
             "moderationNotice": "Боты не мадэрыруюцца Nerimity. Калі вы заўважыце шкодных альбо парушаючых умовы карыстаньня ботаў, адпраўце на іх скаргу.",
             "inviteButton": "Запрасіць",
-            "serverCount": "На {{count}} сэрвэрах"
+            "serverCount": "На {{count}} сэрвэрох"
         },
         "themes": {
             "title": "Дасьледаваньне - Тэмы",
@@ -297,20 +297,20 @@
                 "createInviteButton": "Стварыць запрашэньне",
                 "serverInvites": "Запрашэньні сэрвэру",
                 "serverInvitesDescription": "Запрасіце свайіх сяброў на гэты сэрвэр.",
-                "customInviteVerifiedOnlyNotice": "Карыстальніцкія запрашэньні даступныя толькі на вэрыфікаваных сэрвэрах.",
+                "customInviteVerifiedOnlyNotice": "Карыстальніцкія запрашэньні даступныя толькі на вэрыфікаваных сэрвэрох.",
                 "customLink": "Карыстальніцкая спасылка",
                 "uses": "{{count}} выкарыстаньня(ў)"
             },
             "publishServer": {
-                "publishNotice": "Пасьля публікацыйі, сэрвэр зьявіцца ва ўкладцы <1>«Дасьледаваць»</1>.",
+                "publishNotice": "Пасьля публікацыйі сэрвэр зьявіцца ва ўкладцы <1>«Дасьледаваць»</1>.",
                 "public": "Публічны",
                 "publicDescription": "Зрабіць гэты сэрвэр публічным.",
                 "bumpServer": "Усхваліць сэрвэр",
-                "bumpServerDescription": "Падтрымайце сэрвэр, каб ён падняўся ўгору.",
+                "bumpServerDescription": "Усхваліце сэрвэр, каб ён падняўся ўгору.",
                 "bumpButton": "Усхваліць ({{count}})",
                 "descriptionLabel": "Апісаньне сэрвэра ({{current}}/{{max}})",
-                "publishServerButton": "Апублікаваць сэрвэр",
-                "unpublishServerButton": "Зрабіць сэрвэр прыватным",
+                "publishServerButton": "Апублікаваць",
+                "unpublishServerButton": "Зрабіць прыватным",
                 "bumpCooldown": "Вы мусіце пачакаць {{hours}} гадзін, {{minutes}} хвілін, і {{seconds}} сякунд каб усхваліць гэты сэрвэр."
             },
             "verify": {
@@ -328,10 +328,10 @@
                     "members": "{{count}} альбо больш удзельнікаў",
                     "membersDescription": "На вашым сэрвэры мусіць быць прынамсі {{count}} удзельнікаў.",
                     "profanityFree": "Без блюзьнерства",
-                    "profanityFreeDescription": "Назва сэрвэра, аватар і банар мусяць быць без непрыстойнае брыдкае мовы.",
+                    "profanityFreeDescription": "Назва сэрвэра, аватар і банар мусяць быць безь непрыстойнае брыдкае мовы.",
                     "avatarAndBanner": "Аватар і банар",
-                    "avatarAndBannerDescription": "У сэрвэра мусіць быць аватар і банар.",
-                    "rules": "Правіла сэрвэра",
+                    "avatarAndBannerDescription": "У сэрвэра мусяць быць аватар і банар.",
+                    "rules": "Правілы сэрвэра",
                     "rulesDescription": "На сэрвэры мусіць быць канал з правіламі."
                 },
                 "perks": {
@@ -409,8 +409,8 @@
             "manageChannelsDescription": "Дазвол на рэдагаваньне й выдаленьне каналаў.",
             "kick": "Выганяць",
             "kickDescription": "Дазвол выганяць удзельнікаў.",
-            "ban": "Блякаваць",
-            "banDescription": "Дазвол на блякіроўку ўдзельнікаў.",
+            "ban": "Баніць",
+            "banDescription": "Дазвол на бан ўдзельнікаў.",
             "mentionEveryone": "Згадваць усіх",
             "mentionEveryoneDescription": "Дазваляе згадваньне @everyone. Адміны могуць згадваць усіх незалежна ад гэтага дазволу.",
             "nicknameMember": "Зьмяняць нікнэймы",
@@ -510,7 +510,8 @@
             "postsAndMessagesNotice": "Выдаленьне вашых допісаў і паведамленьняў можа заняць некалькі тыдняў.",
             "deleteCheckbox": "Выдаліць мае допісы і паведамленьні",
             "usernameFont": "Шрыфт імі карыстача",
-            "default": "Прадвызначаны"
+            "default": "Прадвызначаны",
+            "confirmPasswordToContinue": "Сьцьвярдзіце ваш пароль, каб працягнуць"
         },
         "privacy": {
             "lastOnline": {
@@ -603,7 +604,16 @@
             "voiceMessage": "Галасавое паведамленьне",
             "gifPicker": "Выбар GIF",
             "emojiPicker": "Выбар эмодзі",
-            "sendButton": "Дасыланьне паведамленьня"
+            "sendButton": "Дасыланьне паведамленьня",
+            "exportButton": "Экспарт",
+            "importButton": "Імпарт",
+            "exportModal": "Тэма скапіяваная да буфэра.",
+            "importModal": "Устаўце тэму сюды:",
+            "rightDrawerMode": "Рэжым правага высоўнага мэню",
+            "swipeToOpen": "Чырканьне для адкрыцьця",
+            "swipeToOpenDescription": "Адкрываць правае высоўнае мэню чырканьнем з правага боку экрана. Гэта адключыць чырканьне для адказу.",
+            "headerTapToOpen": "Націсканьне на загаловак для адкрыцьця",
+            "headerTapToOpenDescription": "Адкрываць правае высоўнае мэню націсканьнем на загаловак. Гэта ўключыць чырканьне для адказу."
         },
         "window": {
             "downloadAppNotice": "Каб змяніць гэтыя налады, вы мусіце спампаваць аплікацыю Nerimity для ПК.",
@@ -639,14 +649,54 @@
         "developer": {
             "oauth2": {
                 "description": "Кіраваньне OAuth2",
-                "title": "OAuth2",
-                "generateLink": "Згенерыраваць спасылку"
+                "generateLink": "Згенерыраваць спасылку",
+                "documentation": "Дакумэнтацыя OAuth2",
+                "clientId": "ID кліента",
+                "clientSecret": "Сэкрэт кліента",
+                "secretRefreshed": "Сэкрэт кліента быў абноўлены.",
+                "secretCopied": "Сэкрэт кліента скапіяваны да буфэра.",
+                "redirectUris": "Перанакіравальныя URI",
+                "uri": "URI {{count}}",
+                "redirectUri": "Перанакіравальная URI"
+            },
+            "applicationsDescription": "Стварайце ботаў для Nerimity.",
+            "apiDocumentation": "Дакумэнтацыя API (няпоўная)",
+            "addButton": "Дадаць аплікацыю",
+            "name": "Назва аплікацыйі",
+            "appClientId": "ID аплікацыйі/кліента",
+            "botUser": "Профіль бота",
+            "createBotUser": "Стварыць новага бота",
+            "editBotUser": "Рэдагаваць бота",
+            "createBotUserButton": "Стварыць бота",
+            "deleteApplication": {
+                "title": "Выдаленьне аплікацыйі",
+                "willNotGetDeleted": "Што не будзе выдалена:",
+                "andMore": "• і больш",
+                "willNotGetDeletedDescription": "Вы можаце уласнаруч выдаліць іх перад выдаленьнем вашае аплікацыйі.",
+                "deleteAppButton": "Выдаліць гэтую аплікацыю"
+            },
+            "refreshButton": "Абнавіць",
+            "bot": {
+                "createInvite": "Стварэньне запрашальнае спасылкі",
+                "createLinkButton": "Стварыць спасылку",
+                "token": "Токэн",
+                "tokenRefreshed": "Токэн быў абноўлены.",
+                "tokenCopied": "Токэн скапіяваны да буфэра.",
+                "permissionsDescription": "Кіраваньне дазволамі гэтае спасылкі.",
+                "publishBot": "Публікацыя бота",
+                "publishBotDescription": "Дадайце свайго бота на старонку дасьледваньня, каб яго маглі зьнайсьці йншыя карыстачы.",
+                "publishNotice": "Пасьля публікацыйі бот зьявіцца ва ўкладцы <1>«Дасьледаваць»</1>.",
+                "bumpBot": "Усхваліць бота",
+                "bumpBotDescription": "Усхваліце бота, каб ён падняўся ўгору",
+                "bumpBotCooldown": "Вы мусіце пачакаць {{hours}} гадзін, {{minutes}} хвілін, і {{seconds}} сякунд каб усхваліць гэтага бота.",
+                "publicDescription": "Зрабіце гэтага бота публічным.",
+                "botDescription": "Апісаньне бота ({{current}}/{{max}})"
             }
         },
         "badges": {
             "noticeTitle": "Ахвяраваньні",
             "notice": "Падтрымайце гэты праект грашыма.",
-            "palestineDescription": "Можна атрымаць на старонцы {{account}} -> {{profile}}",
+            "palestineDescription": "Можна атрымаць у наладах профілю",
             "price": "Аблямоўкі за {{price}}",
             "supportMethods": "Мэтады падтрымкі"
         },
@@ -749,8 +799,8 @@
         "title": "Рэдагаваць ролі"
     },
     "banModal": {
-        "title": "Заблякаваць {{username}}?",
-        "message": "Вы ўпэўненыя, што хочаце заблякаваць <1>{{username}}</1>?",
+        "title": "Забаніць {{username}}?",
+        "message": "Вы ўпэўненыя, што хочаце забаніць <1>{{username}}</1>?",
         "deletePastMessagesCheckbox": "Выдаліць паведамленьні, адпраўленыя за апошнія 7 гадзін.",
         "banButton": "Забаніць",
         "banning": "Банім…",
@@ -769,7 +819,8 @@
         "markUnread": "Пазначыць непрачытаным",
         "pinMessage": "Замацаваць",
         "unpinMessage": "Адмацаваць",
-        "copyHTML": "Скапіяваць як HTML"
+        "copyHTML": "Скапіяваць як HTML",
+        "copyMessageLink": "Скапіяваць спасылку на паведамленьне"
     },
     "profile": {
         "followButton": "Падпісацца",
@@ -781,11 +832,11 @@
         "messageButton": "Напісаць",
         "mutualFriends": "Агульныя сябры ({{count}})",
         "mutualServers": "Агульныя сэрвэры ({{count}})",
-        "postsTab": "Публікацыйі",
+        "postsTab": "Допісы",
         "followersTab": "Падпісанты",
         "followingTab": "Падпіскі",
-        "postsAndRepliesTab": "Публікацыйі й адказы ({{count}})",
-        "likedPostsTab": "Упадабаныя публікацыйі ({{count}})",
+        "postsAndRepliesTab": "Допісы й адказы ({{count}})",
+        "likedPostsTab": "Упадабаныя допісы ({{count}})",
         "followsYou": "Падпісант",
         "badge": "Аблямоўка «{{badgeName}}»",
         "blockButton": "Заблякаваць",
@@ -811,21 +862,38 @@
     },
     "posts": {
         "deletePostModal": {
-            "message": "Вы ўпэўненыя, што хочаце выдаліць гэтую публікацыю?",
-            "cancelButton": "Скасаваць",
-            "deleteButton": "Выдаліць"
+            "message": "Вы ўпэўненыя, што хочаце выдаліць гэты допіс?",
+            "title": "Выдаліць допіс?"
         },
-        "postWasDeleted": "Гэтая публікацыя была выдаленая!",
-        "someoneLikedYourPost": "<1>{{username}}</1> упадабаў вашую публікацыю!",
-        "someoneRepostedYourPost": "<1>{{username}}</1> пашырыў вашую публікацыю!",
+        "postWasDeleted": "Гэты допіс быў выдалены!",
+        "someoneLikedYourPost": "<1>{{username}}</1> упадабаў ваш допіс!",
+        "someoneRepostedYourPost": "<1>{{username}}</1> пашырыў ваш допіс!",
         "someoneFollowedYou": "<1>{{username}}</1> падпісаўся на вас!",
-        "someoneRepliedToPost": "<1>{{username}}</1> пакінуў адказ на вашую публікацыю!",
-        "createAPostInputPlaceholder": "Дадаць публікацыю…",
+        "someoneRepliedToPost": "<1>{{username}}</1> пакінуў адказ на ваш допіс!",
+        "createAPostInputPlaceholder": "Стварыце допіс…",
         "replyInputPlaceholder": "Напішыце адказ…",
         "replyButton": "Адказаць",
-        "createButton": "Дадаць",
+        "createButton": "Стварыць",
         "pollOptions": "Варыянты апытаньня",
-        "optionNumberPlaceholder": "Вырыянт {{number}}"
+        "optionNumberPlaceholder": "Вырыянт {{number}}",
+        "title": "Допіс",
+        "viewCount": "Прыкладная колькасьць праглядаў",
+        "voteButton": "Прагаласаваць",
+        "voteCount": "{{count}} голас(а/оў)",
+        "copyPostButton": "Скапіяваць допіс",
+        "sections": {
+            "replies": "Адказы ({{count}})",
+            "likes": "Падабаньні ({{count}})",
+            "reposts": "Пашырэньні ({{count}})"
+        },
+        "editPostModalTitle": "Рэдагаваньне допісу",
+        "sort": {
+            "latest": "Апошнія",
+            "mostLiked7Days": "Найбольш упадабаньняў (за 7 дзён)",
+            "mostLiked30Days": "Найбольш упадабаньняў (за 30 дзён)",
+            "mostLikedAllTime": "Найбольш упадабаньняў (за ўвесь час)"
+        },
+        "postWarning": "Самашкодніцтва забароненае, на ўліковы запіс будуць накладзеныя абмежаваньні."
     },
     "informationDrawer": {
         "channelNotice": "Папярэджаньне каналу",
@@ -854,7 +922,7 @@
     },
     "invite": {
         "loading": "Загрузка запрашэньня…",
-        "invalid": "Няправільны код запрашэньня",
+        "invalid": "Несапраўдны код запрашэньня",
         "joinButton": "Далучыцца",
         "joiningButton": "Далучаемся…",
         "visitButton": "Наведаць",
@@ -921,17 +989,14 @@
         "translationError": "Не ўдалося перакласьці паведамленьне.",
         "translation": {
             "title": "Пераклад"
-        }
+        },
+        "imageMessage": "Паведамленьне з відарысам"
     },
     "colorPickerModal": {
-        "title": "Выбар колеру",
-        "done": "Гатова"
+        "title": "Выбар колеру"
     },
     "photoEditor": {
         "title": "Рэдактар фота",
-        "cancel": "Скасаваць",
-        "edit": "Адрэдагаваць",
-        "undo": "Адрабіць (Ctrl + Z)",
         "brush": "Пэндзаль",
         "erase": "Гумка",
         "strokeWidth": "Шырыня пэндзалю: {{width}}",
@@ -940,8 +1005,7 @@
         "desktopZoom": "Прагортка: зьмена маштабу"
     },
     "imageCropModal": {
-        "title": "Абрэзаць відарыс",
-        "done": "Гатова"
+        "title": "Абрэзаць відарыс"
     },
     "oauth2": {
         "AuthorizeButton": "Аўтарызаваць",
@@ -950,10 +1014,10 @@
     "badges": {
         "kitty": {
             "name": "Кіса",
-            "blueDescription": "Кіса з блякітнымі вушкамі",
-            "whiteDescription": "Кіса з белымі вушкамі",
+            "blueDescription": "Вушкі кісы з Арктыкі",
+            "whiteDescription": "Кіса пароды рыска",
             "maidDescription": "Кіса-пакаёўка",
-            "purpleDescription": "Кіса зь фіялетавымі вушкамі"
+            "purpleDescription": "Чэшырская кіса"
         },
         "foxy": {
             "name": "Ліса",
@@ -989,7 +1053,7 @@
         },
         "bot": {
             "name": "Карыстач-бот",
-            "description": "Карыстач-бот"
+            "description": "Гэты карыстач ёсьць ботам"
         },
         "credit": {
             "avatarBorder": "Аблямоўка аватара ад {{author}} на {{platform}}",
@@ -997,28 +1061,28 @@
         },
         "bunny": {
             "name": "Трусік",
-            "bunnyDescription": "Трусік з чорнымі вушкамі",
+            "bunnyDescription": "Трусік з прыгнутым вушкам",
             "maidDescription": "Трусік-пакаёўка"
         },
         "dog": {
             "name": "Сабачка",
-            "dogDescription": "Сабака з карычневымі вушкамі",
-            "shibaDescription": "Сабака Сіба-іну"
+            "dogDescription": "Вушкі добрага хлопчыка",
+            "shibaDescription": "Сабачка Сіба-іну"
         },
         "wolf": {
             "name": "Ваўчок",
-            "wolfDescription": "Вушкі воўка"
+            "wolfDescription": "Вушкі ваўчка"
         },
         "goat": {
             "name": "Каза",
-            "goatDescription": "Белыя казіныя вухі",
+            "goatDescription": "Мілыя казіныя вушкі",
             "goatHornDescription": "Казіныя рогі"
         },
         "deer": {
             "name": "Алень",
-            "deerDescription": "Вухі і рага аленя",
-            "deerDarkDescription": "Цёмныя вухі і рага аленя",
-            "deerWhiteDescription": "Алень з белымі вушкамі"
+            "deerDescription": "Мілыя рогі аленя",
+            "deerDarkDescription": "Рогі эма-аленя",
+            "deerWhiteDescription": "Мілы алень з ружовымі вушкамі"
         }
     },
     "status": {
@@ -1045,7 +1109,8 @@
             "relative": "Адносны",
             "offset": "Зрух",
             "doneButton": "Гатова"
-        }
+        },
+        "checkbox": "Птушка"
     },
     "connectionErrorModal": {
         "title": "Памылка пры падлучэньні",
@@ -1066,7 +1131,7 @@
             "noMentions": "Няма згадваньняў"
         },
         "pins": {
-            "noPins": "Няма замацаваных"
+            "noPins": "Няма замацаваных паведамленьняў"
         },
         "jump": "Перайсьці",
         "voice": {
@@ -1100,11 +1165,11 @@
                 "descending": "Па ўбываньні"
             }
         },
-        "inVoice": "У выкліку",
+        "inVoice": "Выклік ідзе",
         "addChannel": "Дадаць канал"
     },
     "inVoiceActions": {
-        "connectedFor": "Выклік ідзе"
+        "connectedFor": "У выкліку"
     },
     "inputFieldActions": {
         "copy": "Скапіяваць",
@@ -1118,7 +1183,6 @@
     },
     "general": {
         "nothingSelected": "Нічога ня выбрана",
-        "selectItem": "Абраць элемэнт",
         "searchPlaceholder": "Пошук",
         "backButton": "Назад",
         "cancelButton": "Скасаваць",
@@ -1148,7 +1212,7 @@
     },
     "nicknameChangeModal": {
         "title": "Рэдагаваньне профілю сэрвэра",
-        "description": "Усе на гэтым сэрвэры пабачаць ваш псэўданім.",
+        "description": "Усе на гэтым сэрвэры пабачаць гэты псэўданім.",
         "inputLabel": "Псэўданім"
     },
     "transferOwnershipModal": {

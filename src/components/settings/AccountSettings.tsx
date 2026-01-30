@@ -36,13 +36,13 @@ import {
 } from "@/common/localStorage";
 import socketClient from "@/chat-api/socketClient";
 import DeleteConfirmModal from "../ui/delete-confirm-modal/DeleteConfirmModal";
-import { useCustomPortal } from "../ui/custom-portal/CustomPortal";
+import { toast, useCustomPortal } from "../ui/custom-portal/CustomPortal";
 import useServers from "@/chat-api/store/useServers";
 import LegacyModal from "../ui/legacy-modal/LegacyModal";
 import { FlexColumn, FlexRow } from "../ui/Flexbox";
 import { Notice } from "../ui/Notice/Notice";
 import { RawChannelNotice, RawUser } from "@/chat-api/RawData";
-import { setSettingsHeaderPreview } from "./SettingsPane";
+import { setSettingsHeaderPreview } from "./settingsHeaderPreview";
 import Icon from "../ui/icon/Icon";
 import { AdvancedMarkupOptions } from "../advanced-markup-options/AdvancedMarkupOptions";
 import { formatMessage } from "../message-pane/MessagePane";
@@ -253,7 +253,7 @@ export function EditAccountPage(props: {
 
   const onCropped = (
     points: number[],
-    type: "avatar" | "banner" = "avatar"
+    type: "avatar" | "banner" = "avatar",
   ) => {
     const pointsKey = type === "banner" ? "bannerPoints" : "avatarPoints";
 
@@ -262,6 +262,12 @@ export function EditAccountPage(props: {
   };
 
   const onAvatarPick = (files: string[], rawFiles: FileList) => {
+    const size = rawFiles[0]?.size || 0;
+    const MAX_SIZE = 12; // 12 MB
+    if (size > MAX_SIZE * 1024 * 1024) {
+      toast(`File size must be less than ${MAX_SIZE}MB`);
+      return;
+    }
     if (files[0]) {
       createPortal((close) => (
         <ImageCropModal
@@ -276,6 +282,12 @@ export function EditAccountPage(props: {
   };
 
   const onBannerPick = (files: string[], rawFiles: FileList) => {
+    const size = rawFiles[0]?.size || 0;
+    const MAX_SIZE = 12; // 12 MB
+    if (size > MAX_SIZE * 1024 * 1024) {
+      toast(`File size must be less than ${MAX_SIZE}MB`);
+      return;
+    }
     if (files[0]) {
       createPortal((close) => (
         <ImageCropModal
@@ -480,12 +492,10 @@ export function EditAccountPage(props: {
 
       <SettingsBlock
         icon="info"
-        label={t("settings.account.profile")}
-        description={t("settings.account.profileDescription")}
-        href="./profile"
-      >
-        <Icon name="keyboard_arrow_right" />
-      </SettingsBlock>
+        label="Looking for Profile Settings?"
+        description="Profile Settings has been moved to the settings drawer on the left."
+        href="/app/settings/profile"
+      />
       <Show when={!props.bot}>
         <ChangePasswordButton
           onClick={onChangePasswordClick}
@@ -712,7 +722,7 @@ function ChannelNoticeBlock(props: { botToken?: string | null }) {
       return setError(t("settings.account.channelNoticeTooLong"));
     const res = await updateDMChannelNotice(
       formattedContent,
-      props.botToken
+      props.botToken,
     ).catch((err) => {
       setError(err.message);
     });
@@ -960,7 +970,7 @@ const ConfirmPasswordModal = (props: {
   return (
     <LegacyModal
       ignoreBackgroundClick
-      title={"Confirm Password"}
+      title={t("registerPage.confirmPassword")}
       close={props.close}
       actionButtons={actionButtons}
     >
@@ -971,7 +981,7 @@ const ConfirmPasswordModal = (props: {
         `}
         gap={10}
       >
-        <Text size={14}>{"Confirm your password to continue"}</Text>
+        <Text size={14}>{t("settings.account.confirmPasswordToContinue")}</Text>
 
         <Input value={password()} onText={setPassword} type="password" />
       </FlexColumn>

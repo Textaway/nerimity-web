@@ -48,11 +48,11 @@ import DropDown, { DropDownItem } from "../ui/drop-down/DropDown";
 import { AdvancedMarkupOptions } from "../advanced-markup-options/AdvancedMarkupOptions";
 import Input from "../ui/input/Input";
 import { formatMessage } from "../message-pane/MessagePane";
-import { logout } from "@/common/logout";
-import { currentTheme } from "@/common/themes";
+import {  DefaultTheme, defaultThemeCSSVars } from "@/common/themes";
 import { userDetailsPreloader } from "@/common/createPreloader";
 import { UserActivity } from "../user-activity/UserActivity";
 import { Fonts } from "@/common/fonts";
+import { LogoutModal } from "../settings/LogoutModal";
 
 interface Props {
   dmPane?: boolean;
@@ -158,7 +158,7 @@ const DesktopProfileFlyout = (props: {
   anchor?: "left" | "right";
   showProfileSettings?: boolean;
 }) => {
-  const { createPortal } = useCustomPortal();
+  const { createPortal, openedPortals } = useCustomPortal();
   const { users, account, serverMembers, posts } = useStore();
   const [details, setDetails] = createSignal<UserDetails | undefined>(
     undefined
@@ -197,14 +197,14 @@ const DesktopProfileFlyout = (props: {
   const bgColor = createMemo(() => {
     try {
       return average([
-        colors().bg?.[0] || currentTheme()["pane-color"],
-        colors().bg?.[1] || currentTheme()["pane-color"],
+        colors().bg?.[0] || DefaultTheme["pane-color"],
+        colors().bg?.[1] || DefaultTheme["pane-color"],
       ])
         .luminance(0.01)
         .alpha(0.9)
         .hex();
     } catch {
-      return currentTheme()["pane-color"];
+      return DefaultTheme["pane-color"];
     }
   });
 
@@ -279,6 +279,10 @@ const DesktopProfileFlyout = (props: {
   let textSelected = false;
 
   const onBackgroundClick = (event: MouseEvent) => {
+    if (props.showProfileSettings) {
+      if (openedPortals().length > 1) return;
+    }
+
     if (props.mobile) return;
     if (event.target instanceof Element) {
       if (event.target.closest(".dropdown-popup")) return;
@@ -398,6 +402,7 @@ const DesktopProfileFlyout = (props: {
                     "--font": `'${font()?.name}'`,
                     "--lh": font()?.lineHeight,
                     "--scale": font()?.scale,
+                    "--ls": font()?.letterSpacing,
                   }}
                   class={styles.username}
                 >
@@ -683,6 +688,7 @@ const DesktopProfileFlyout = (props: {
       style={{
         ...style(),
         ...props.style,
+        ...defaultThemeCSSVars,
         "--floating-bg-color": bgColor(),
         "--floating-primary-color": colors()?.primary || "var(--primary-color)",
       }}
@@ -691,8 +697,8 @@ const DesktopProfileFlyout = (props: {
         class={styles.flyoutInnerContainer}
         style={{
           background: `linear-gradient(180deg, ${
-            colors()?.bg?.[0] || currentTheme()["pane-color"]
-          }, ${colors()?.bg?.[1] || currentTheme()["pane-color"]})`,
+            colors()?.bg?.[0] || DefaultTheme["pane-color"]
+          }, ${colors()?.bg?.[1] || DefaultTheme["pane-color"]})`,
         }}
         classList={{
           [styles.dmPane]: props.dmPane,
@@ -806,6 +812,7 @@ function FlyoutTitle(props: {
 function SelfArea(props: { bg: string }) {
   const store = useStore();
   const navigate = useNavigate();
+  const { createPortal } = useCustomPortal();
 
   const userId = () => store.account.user()?.id;
   const navigateToProfile = () => {
@@ -818,6 +825,10 @@ function SelfArea(props: { bg: string }) {
   const goToNotes = () => {
     store.users.openDM(userId()!);
     emitDrawerGoToMain();
+  };
+
+  const logoutClick = () => {
+    createPortal((close) => <LogoutModal close={close} />);
   };
 
   return (
@@ -844,7 +855,7 @@ function SelfArea(props: { bg: string }) {
           label={t("header.logoutButton")}
           icon="logout"
           alert
-          onClick={logout}
+          onClick={logoutClick}
         />
       </div>
     </>

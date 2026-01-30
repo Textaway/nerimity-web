@@ -34,7 +34,8 @@ import Button from "../ui/Button";
 import env from "@/common/env";
 import Text from "../ui/Text";
 import { RawServer, RawUser } from "@/chat-api/RawData";
-import { AuditLogPane, Server, User } from "./ModerationPane";
+import { AuditLogPane, Server } from "./ModerationPane";
+import { User } from "./UserComponents";
 import EditUserSuspensionModal from "./EditUserSuspensionModal";
 import WarnUserModal from "./WarnUserModal";
 import { UserDetails } from "@/chat-api/services/UserService";
@@ -123,8 +124,8 @@ export default function UserPage() {
       () => params.userId,
       () => {
         getUser(params.userId).then(setUser);
-      }
-    )
+      },
+    ),
   );
 
   const requestStatus = () => (requestSent() ? "Saving..." : "Save Changes");
@@ -355,8 +356,8 @@ const BadgeItem = (props: {
       onMouseOver={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       class={BadgeItemStyles}
-      label={props.badge.name}
-      description={props.badge.description}
+      label={props.badge.name()}
+      description={props.badge.description?.()}
       icon={
         <Avatar
           user={{ ...props.user, badges: props.badge.bit }}
@@ -364,11 +365,14 @@ const BadgeItem = (props: {
           animate={hovered()}
         />
       }
+      onClick={() => {
+        props.onBadgeUpdate(
+          !hasBit(props.badges, props.badge.bit),
+          props.badge.bit,
+        );
+      }}
     >
-      <Checkbox
-        checked={hasBit(props.badges, props.badge.bit)}
-        onChange={(checked) => props.onBadgeUpdate(checked, props.badge.bit)}
-      />
+      <Checkbox checked={hasBit(props.badges, props.badge.bit)} />
     </SettingsBlock>
   );
 };

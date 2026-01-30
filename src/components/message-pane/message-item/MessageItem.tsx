@@ -13,7 +13,10 @@ import {
   RawMessageReaction,
   RawUser,
 } from "@/chat-api/RawData";
-import useMessages, { Message, MessageSentStatus } from "@/chat-api/store/useMessages";
+import useMessages, {
+  Message,
+  MessageSentStatus,
+} from "@/chat-api/store/useMessages";
 import {
   addMessageReaction,
   fetchMessageReactedUsers,
@@ -101,11 +104,11 @@ import { Fonts, getFont } from "@/common/fonts";
 import useAccount from "@/chat-api/store/useAccount";
 import { Entity } from "@nerimity/nevula";
 const ImagePreviewModal = lazy(
-  () => import("@/components/ui/ImagePreviewModal")
+  () => import("@/components/ui/ImagePreviewModal"),
 );
 
 const DeleteMessageModal = lazy(
-  () => import("../message-delete-modal/MessageDeleteModal")
+  () => import("../message-delete-modal/MessageDeleteModal"),
 );
 
 interface FloatingOptionsProps {
@@ -207,6 +210,7 @@ interface MessageItemProps {
   showNewDayMarker?: boolean;
   isEditing?: boolean;
   containerWidth?: number;
+  allowSwipeActions?: boolean;
 }
 
 interface DetailsProps {
@@ -223,10 +227,10 @@ const Details = (props: DetailsProps) => {
   const [t] = useTransContext();
 
   const topRoleWithColor = createMemo(() =>
-    props.serverMember?.topRoleWithColor()
+    props.serverMember?.topRoleWithColor(),
   );
   const font = createMemo(() =>
-    getFont(props.message.createdBy.profile?.font || 0)
+    getFont(props.message.createdBy.profile?.font || 0),
   );
 
   return (
@@ -250,6 +254,7 @@ const Details = (props: DetailsProps) => {
           "--color": topRoleWithColor()?.hexColor!,
           "--font": `'${font()?.name}'`,
           "--lh": font()?.lineHeight,
+          "--ls": font()?.letterSpacing,
           "--scale": font()?.scale,
         }}
       >
@@ -319,7 +324,7 @@ const MessageItem = (props: MessageItemProps) => {
   const serverMember = createMemo(() =>
     params.serverId
       ? serverMembers.get(params.serverId, props.message.createdBy.id)
-      : undefined
+      : undefined,
   );
   const server = createMemo(() => servers.get(params.serverId!));
 
@@ -381,7 +386,7 @@ const MessageItem = (props: MessageItemProps) => {
     const translated = await fetchTranslation(props.message.content!).catch(
       () => {
         toast(t("message.translationError"));
-      }
+      },
     );
     if (!translated) return;
     setTranslatedContent(translated);
@@ -395,7 +400,7 @@ const MessageItem = (props: MessageItemProps) => {
   });
 
   const selfMember = createMemo(() =>
-    serverMembers.get(params.serverId!, account.user()?.id!)
+    serverMembers.get(params.serverId!, account.user()?.id!),
   );
   createEffect(
     on(
@@ -414,28 +419,28 @@ const MessageItem = (props: MessageItemProps) => {
           const isSomeoneMentioned =
             props.message.content?.includes("[@:s]") || false;
           const isQuoted = props.message.quotedMessages?.find(
-            (m) => m.createdBy?.id === account.user()?.id
+            (m) => m.createdBy?.id === account.user()?.id,
           );
           const isReplied = props.message.replyMessages?.find(
-            (m) => m.replyToMessage?.createdBy?.id === account.user()?.id
+            (m) => m.replyToMessage?.createdBy?.id === account.user()?.id,
           );
           const isRoleMentioned =
             serverMember()?.hasPermission(ROLE_PERMISSIONS.MENTION_ROLES) &&
             props.message.roleMentions.find(
               (r) =>
-                r.id !== server()?.defaultRoleId && selfMember()?.hasRole(r.id)
+                r.id !== server()?.defaultRoleId && selfMember()?.hasRole(r.id),
             );
           const isMentioned =
             isEveryoneMentioned ||
             props.message.mentions?.find((u) => u.id === account.user()?.id);
 
           setIsMentioned(
-            !!isQuoted || !!isMentioned || !!isReplied || !!isRoleMentioned
+            !!isQuoted || !!isMentioned || !!isReplied || !!isRoleMentioned,
           );
           setIsSomeoneMentioned(isSomeoneMentioned);
         });
-      }
-    )
+      },
+    ),
   );
 
   const showProfileFlyout = (event: MouseEvent) => {
@@ -459,10 +464,101 @@ const MessageItem = (props: MessageItemProps) => {
         userId: props.message.createdBy.id,
       },
       "profile-pane-flyout-" + props.message.createdBy.id,
-      true
+      true,
     );
   };
 
+  const [swipeAction, setSwipeAction] = createSignal<"none" | "reply" | "edit">(
+    "none",
+  );
+  let messageItemRef: HTMLDivElement | undefined;
+  let animationFrame: number;
+  let startX = 0;
+  let currentX = 0;
+  let isSwiping = false;
+
+  const EDIT_THRESHOLD = 80;
+  const REPLY_THRESHOLD = 150;
+
+  const canEditSwipe = () =>
+    account.user()?.id === props.message.createdBy.id &&
+    props.message.type === MessageType.CONTENT;
+
+  const handleTouchStart = (e: TouchEvent) => {
+    if (!props.allowSwipeActions) return;
+
+    startX = e.touches[0]?.clientX || 0;
+    currentX = startX;
+    isSwiping = true;
+  };
+
+  const handleTouchMove = (e: TouchEvent) => {
+    if (!props.allowSwipeActions || !isSwiping) return;
+
+    if (animationFrame) {
+      window.cancelAnimationFrame(animationFrame);
+    }
+    animationFrame = window.requestAnimationFrame(() => {
+      currentX = e.touches[0]?.clientX || 0;
+      const deltaX = currentX - startX;
+      if (deltaX > 0) return;
+      const absDelta = Math.abs(deltaX);
+
+      // Apply resistance curve for smoother feel
+      const translateX = deltaX;
+
+      setSwipeAction(
+        absDelta >= REPLY_THRESHOLD
+          ? "reply"
+          : absDelta >= EDIT_THRESHOLD && canEditSwipe()
+            ? "edit"
+            : "none",
+      );
+
+      if (messageItemRef) {
+        messageItemRef.style.transform = `translateX(${translateX}px)`;
+        messageItemRef.style.transition = "none";
+      }
+    });
+  };
+
+  const handleTouchEnd = (e: TouchEvent) => {
+    if (animationFrame) {
+      window.cancelAnimationFrame(animationFrame);
+    }
+    animationFrame = window.requestAnimationFrame(() => {
+      const action = swipeAction();
+      setSwipeAction("none");
+
+      if (messageItemRef) {
+        messageItemRef.style.transition =
+          "transform 0.2s ease-out, background-color 0.2s";
+        messageItemRef.style.transform = "";
+
+        setTimeout(() => {
+          if (messageItemRef) {
+            messageItemRef.style.backgroundColor = "";
+          }
+        }, 200);
+      }
+
+      if (action === "edit" && canEditSwipe()) {
+        const { channelProperties } = useStore();
+        channelProperties.setEditMessage(
+          props.message.channelId,
+          props.message,
+        );
+      } else if (action === "reply") {
+        const { channelProperties } = useStore();
+        channelProperties.addReply(props.message.channelId, props.message);
+        props.textAreaEl?.focus();
+      }
+
+      isSwiping = false;
+      startX = 0;
+      currentX = 0;
+    });
+  };
   return (
     <>
       <Show when={isNewDay()}>
@@ -478,13 +574,25 @@ const MessageItem = (props: MessageItemProps) => {
           conditionalClass(props.isEditing, styles.isEditing),
           conditionalClass(isSomeoneMentioned(), styles.someoneMentioned),
           props.class,
-          "messageItem"
+          "messageItem",
         )}
+        ref={messageItemRef}
         onContextMenu={props.contextMenu}
         onMouseEnter={() => setHovered(true)}
         onMouseLeave={() => setHovered(false)}
         id={`message-${props.message.id}`}
+        onTouchMove={handleTouchMove}
+        onTouchStart={handleTouchStart}
+        onTouchEnd={handleTouchEnd}
       >
+        <div class={styles.actionIndicator}>
+          <Show when={swipeAction() === "reply"}>
+            <Icon name="reply" size={24} color="var(--primary-color)" />
+          </Show>
+          <Show when={swipeAction() === "edit"}>
+            <Icon name="edit" size={24} color="var(--success-color)" />
+          </Show>
+        </div>
         <Show when={!props.hideFloating && hovered()}>
           <FloatOptions
             textAreaEl={props.textAreaEl}
@@ -501,7 +609,7 @@ const MessageItem = (props: MessageItemProps) => {
                 onClick={() => setBlockedMessage(false)}
                 class={classNames(
                   styles.blockedMessage,
-                  conditionalClass(isCompact(), styles.compact)
+                  conditionalClass(isCompact(), styles.compact),
                 )}
               >
                 {t("message.blocked")}
@@ -548,7 +656,7 @@ const MessageItem = (props: MessageItemProps) => {
                     class={classNames(
                       styles.avatar,
                       "avatar",
-                      "trigger-profile-flyout"
+                      "trigger-profile-flyout",
                     )}
                   >
                     <Avatar
@@ -611,21 +719,24 @@ const MessageItem = (props: MessageItemProps) => {
   );
 };
 
-const updateCheckEntity = (message: Message, entity: Entity, state: boolean) => {
-  const messages = useMessages()
+const updateCheckEntity = (
+  message: Message,
+  entity: Entity,
+  state: boolean,
+) => {
+  const messages = useMessages();
 
-  const text = message.content ?? ""
-  const before = text.slice(0, entity.outerSpan.start)
-  const checkbox = `-[${state ? 'x' : ' '}]`
-  const after = text.slice(entity.outerSpan.end, text.length)
+  const text = message.content ?? "";
+  const before = text.slice(0, entity.outerSpan.start);
+  const checkbox = `-[${state ? "x" : " "}]`;
+  const after = text.slice(entity.outerSpan.end, text.length);
 
   messages.editAndStoreMessage(
     message.channelId,
     message.id,
-    `${before}${checkbox}${after}`
+    `${before}${checkbox}${after}`,
   );
-}
-
+};
 
 const Content = (props: {
   message: Message;
@@ -635,7 +746,7 @@ const Content = (props: {
   const params = useParams<{ serverId?: string }>();
   const store = useStore();
   const [t] = useTransContext();
-  const account = useAccount()
+  const account = useAccount();
 
   const canEditMessage = () =>
     account.user()?.id === props.message.createdBy.id &&
@@ -662,7 +773,9 @@ const Content = (props: {
           text={props.message.content || ""}
           serverId={params.serverId}
           canEditCheckboxes={canEditMessage()}
-          onCheckboxChanged={(entity, state) => updateCheckEntity(props.message, entity, state)}
+          onCheckboxChanged={(entity, state) =>
+            updateCheckEntity(props.message, entity, state)
+          }
         />
       </Show>
       <Show
@@ -681,7 +794,7 @@ const Content = (props: {
           onClick={() => {
             store.messages.locallyRemoveMessage(
               props.message.channelId,
-              props.message.id
+              props.message.id,
             );
           }}
         />
@@ -775,7 +888,7 @@ const SystemMessage = (props: {
   showProfileFlyout?: (event: MouseEvent) => void;
 }) => {
   const systemMessage = createMemo(() =>
-    getSystemMessage(props.message.type, props.message.createdBy.bot)
+    getSystemMessage(props.message.type, props.message.createdBy.bot),
   );
 
   return (
@@ -786,7 +899,9 @@ const SystemMessage = (props: {
             name={systemMessage()?.icon}
             class={cn(
               styles.icon,
-              systemMessage()?.icon === "logout" ? styles.logoutIcon : undefined
+              systemMessage()?.icon === "logout"
+                ? styles.logoutIcon
+                : undefined,
             )}
             color={systemMessage()?.color}
           />
@@ -940,7 +1055,7 @@ const LocalVideoEmbed = (props: { attachment: RawAttachment }) => {
       error={isExpired() ? t("fileEmbed.expired") : undefined}
       file={{
         name: decodeURIComponent(
-          props.attachment.path?.split("/").reverse()[0]!
+          props.attachment.path?.split("/").reverse()[0]!,
         ),
         size: props.attachment.filesize!,
         url: env.NERIMITY_CDN + props.attachment.path!,
@@ -961,7 +1076,7 @@ const LocalFileEmbed = (props: { attachment: RawAttachment }) => {
       error={isExpired() ? t("fileEmbed.expired") : undefined}
       file={{
         name: decodeURIComponent(
-          props.attachment.path?.split("/").reverse()[0]!
+          props.attachment.path?.split("/").reverse()[0]!,
         ),
         mime: props.attachment.mime!,
         size: props.attachment.filesize!,
@@ -1009,7 +1124,7 @@ export const YoutubeEmbed = (props: {
     if (props.shorts) {
       const maxWidth = clamp(
         (customWidth || containerWidth()) + (widthOffset || 0),
-        600
+        600,
       );
       const maxHeight =
         containerWidth() <= 600
@@ -1020,7 +1135,7 @@ export const YoutubeEmbed = (props: {
 
     const maxWidth = clamp(
       (customWidth || containerWidth()) + (widthOffset || 0),
-      600
+      600,
     );
     return clampImageSize(1920, 1080, maxWidth, 999999);
   };
@@ -1077,7 +1192,7 @@ const GoogleDriveVideoEmbed = (props: { attachment: RawAttachment }) => {
     if (!googleApiInitialized()) return;
     const file = await getFile(
       props.attachment.fileId!,
-      "name, size, modifiedTime, webContentLink, mimeType, thumbnailLink, videoMediaMetadata"
+      "name, size, modifiedTime, webContentLink, mimeType, thumbnailLink, videoMediaMetadata",
     ).catch((e) => console.log(e));
 
     if (!file) return setError(t("videoEmbed.couldNotGetVideo"));
@@ -1143,7 +1258,7 @@ const VideoEmbed = (props: {
     toast(
       props.file?.expireAt
         ? t("videoEmbed.videoExpired") // Can probably move all "expired" to use a central expired string in future
-        : t("videoEmbed.modifiedOrDeleted")
+        : t("videoEmbed.modifiedOrDeleted"),
     );
 
   return (
@@ -1268,7 +1383,7 @@ const FileEmbed = (props: {
     toast(
       props.file?.expireAt
         ? t("fileEmbed.expired")
-        : t("fileEmbed.modifiedOrDeleted")
+        : t("fileEmbed.modifiedOrDeleted"),
     );
 
   return (
@@ -1354,7 +1469,7 @@ const GoogleDriveFileEmbed = (props: { attachment: RawAttachment }) => {
     if (!googleApiInitialized()) return;
     const file = await getFile(
       props.attachment.fileId!,
-      "name, size, modifiedTime, webContentLink, mimeType, thumbnailLink"
+      "name, size, modifiedTime, webContentLink, mimeType, thumbnailLink",
     ).catch((e) => console.log(e));
     // const file = await getFile(props.attachment.fileId!, "*").catch((e) => console.log(e))
     if (!file) return setError("Could not get file.");
@@ -1419,7 +1534,7 @@ export function ServerInviteEmbed(props: { code: string }) {
     if (!_invite) return;
     if (cachedServer())
       return navigate(
-        RouterEndpoints.SERVER_MESSAGES(_invite.id, _invite.defaultChannelId)
+        RouterEndpoints.SERVER_MESSAGES(_invite.id, _invite.defaultChannelId),
       );
 
     if (joining()) return;
@@ -1473,8 +1588,8 @@ export function ServerInviteEmbed(props: { code: string }) {
                 joining()
                   ? t("invite.joiningButton")
                   : cachedServer()
-                  ? t("invite.visitButton")
-                  : t("invite.joinButton")
+                    ? t("invite.visitButton")
+                    : t("invite.joinButton")
               }
               iconName="login"
               onClick={joinOrVisitServer}
@@ -1509,7 +1624,7 @@ export function OGEmbed(props: {
   const showDetailedTwitterEmbed = () => {
     const [useTwitterEmbed, setUseTwitterEmbed] = useLocalStorage(
       StorageKeys.USE_TWITTER_EMBED,
-      false
+      false,
     );
     if (showDetailed()) {
       return setShowDetailed(false);
@@ -1565,7 +1680,8 @@ export function OGEmbed(props: {
               id: "",
               origSrc: origSrc()!,
               path: `proxy/${encodeURIComponent(origSrc()!)}/embed.${
-                embed().imageMime?.split("/")[1]
+                embed().imageMime?.split("/")[1] +
+                (embed().animated ? "#a" : "")
               }`,
               width: embed().imageWidth,
               height: embed().imageHeight,
@@ -1651,7 +1767,7 @@ const NormalEmbed = (props: {
     <div
       class={classNames(
         styles.ogEmbedContainer,
-        conditionalClass(largeImage(), styles.largeImage)
+        conditionalClass(largeImage(), styles.largeImage),
       )}
     >
       <Show when={embed().imageUrl}>
@@ -1731,14 +1847,14 @@ const htmlEmbedContainerStyles: JSX.CSSProperties = {
 function HTMLEmbed(props: { message: RawMessage }) {
   const id = createUniqueId();
   const embed = createMemo<HtmlEmbedItem | HtmlEmbedItem[]>(() =>
-    unzipJson(props.message.htmlEmbed!)
+    unzipJson(props.message.htmlEmbed!),
   );
   const { hasFocus } = useWindowProperties();
 
   const styleItem = createMemo(
     () =>
       (embed() as HtmlEmbedItem[]).find?.((item) => item?.tag === "style")
-        ?.content[0] as string | undefined
+        ?.content[0] as string | undefined,
   );
 
   return (
@@ -1943,7 +2059,7 @@ function ReactionItem(props: ReactionItemProps) {
       onClick={addReaction}
       class={classNames(
         styles.reactionItem,
-        conditionalClass(props.reaction.reacted, styles.reacted)
+        conditionalClass(props.reaction.reacted, styles.reacted),
       )}
       label={props.reaction.count.toLocaleString()}
       textSize={12}
@@ -1995,7 +2111,7 @@ function Reactions(props: {
           }}
         />
       ),
-      "whoReactedModal"
+      "whoReactedModal",
     );
   };
   const onBlur = () => {
@@ -2101,7 +2217,7 @@ const MessageReplies = (props: { message: Message }) => {
         }),
       },
       props.message.channelId,
-      props.message.id
+      props.message.id,
     );
   }
 
@@ -2114,7 +2230,7 @@ const MessageReplies = (props: { message: Message }) => {
 
     const replyMessages = [...props.message.replyMessages];
     const index = replyMessages.findIndex(
-      (q) => q.replyToMessage?.id === payload.messageId
+      (q) => q.replyToMessage?.id === payload.messageId,
     );
     replyMessages[index] = {
       ...replyMessages[index],
@@ -2125,7 +2241,7 @@ const MessageReplies = (props: { message: Message }) => {
         replyMessages,
       },
       props.message.channelId,
-      props.message.id
+      props.message.id,
     );
   }
 
@@ -2156,7 +2272,7 @@ const MessageReplyItem = (props: {
   const member = () =>
     store.serverMembers.get(
       params.serverId!,
-      props.replyToMessage?.createdBy?.id!
+      props.replyToMessage?.createdBy?.id!,
     );
 
   const topRoleWithColor = createMemo(() => member()?.topRoleWithColor());
@@ -2174,7 +2290,7 @@ const MessageReplyItem = (props: {
       <div
         class={classNames(
           styles.line,
-          props.index === 0 ? styles.first : undefined
+          props.index === 0 ? styles.first : undefined,
         )}
       />
       <div class={styles.replyContentContainer}>

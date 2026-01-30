@@ -532,7 +532,6 @@
         "developer": {
             "oauth2": {
                 "description": "Gerenciar OAuth2",
-                "title": "OAuth2",
                 "generateLink": "Gerar link"
             }
         },
@@ -647,9 +646,7 @@
     },
     "posts": {
         "deletePostModal": {
-            "message": "Tem certeza de que gostaria de excluir esta postagem?",
-            "cancelButton": "Cancelar",
-            "deleteButton": "Excluir"
+            "message": "Tem certeza de que gostaria de excluir esta postagem?"
         },
         "postWasDeleted": "Esta postagem foi excluída!",
         "someoneLikedYourPost": "<1>{{username}}</1> curtiu sua postagem!",
@@ -853,8 +850,7 @@
         "confirmButton": "Excluir"
     },
     "colorPickerModal": {
-        "title": "Seletor de cores",
-        "done": "Feito"
+        "title": "Seletor de cores"
     },
     "systemMessages": {
         "joinServer": {
@@ -876,9 +872,6 @@
     },
     "photoEditor": {
         "title": "Editor de foto",
-        "cancel": "Cancelar",
-        "edit": "Editar",
-        "undo": "Desfazer (Ctrl + Z)",
         "erase": "Excluir",
         "brush": "Pincel",
         "strokeWidth": "Largura do traço: {{width}}",
@@ -887,7 +880,6 @@
         "desktopZoom": "Rodar para ampliar"
     },
     "imageCropModal": {
-        "done": "Feito",
         "title": "Cortar imagem"
     },
     "oauth2": {
@@ -1085,7 +1077,6 @@
         "cannotBeUndone": "Isto não pode ser desfeito!",
         "copyID": "Copiar ID",
         "copyLink": "Copiar link",
-        "selectItem": "Selecionar item",
         "undoButton": "Desfazer",
         "editButton": "Editar",
         "closeButton": "Fechar"

@@ -2,6 +2,7 @@ import { createEffect, For, Show } from "solid-js";
 
 import useStore from "@/chat-api/store/useStore";
 import {
+  rightDrawerMode,
   StorageKeys,
   useChatBarOptions,
   useLocalStorage,
@@ -18,6 +19,9 @@ import {
   customColors,
   setThemeColor,
   DefaultTheme,
+  setCustomColors,
+  updateTheme,
+  ThemeTokens,
 } from "@/common/themes";
 import { ColorPicker } from "../ui/color-picker/ColorPicker";
 import Button from "../ui/Button";
@@ -26,13 +30,17 @@ import style from "./InterfaceSettings.module.css";
 import { useNavigate } from "solid-navigator";
 import { FlexColumn } from "../ui/Flexbox";
 import { timeFormat, setTimeFormat } from "@/common/date";
+import { toast } from "../ui/custom-portal/CustomPortal";
+import { RadioBoxItem } from "../ui/RadioBox";
 
 export default function InterfaceSettings() {
   const { header } = useStore();
+  const { isMobileAgent } = useWindowProperties();
 
   createEffect(() => {
     header.updateHeader({
-      title: t("settings.drawer.title") + " - " + t("settings.drawer.interface"),
+      title:
+        t("settings.drawer.title") + " - " + t("settings.drawer.interface"),
       iconName: "settings",
     });
   });
@@ -47,6 +55,9 @@ export default function InterfaceSettings() {
       <TimeFormatSetting />
       <BlurEffect />
       <ChatBar />
+      <Show when={isMobileAgent()}>
+        <RightDrawerModeBlock />
+      </Show>
       <CustomizeColors />
       <SettingsBlock
         icon="code"
@@ -80,7 +91,7 @@ export function ThemesBlock() {
                 class={style.themeCard}
                 style={{
                   "background-color": colors["pane-color"],
-                  color: colors["text-color"],
+                  color: colors["text-color"] || DefaultTheme["text-color"],
                 }}
               >
                 <div class={style.themeName}>{name}</div>
@@ -114,7 +125,6 @@ export function ThemesBlock() {
           style={{
             "background-color": "rgba(255,255,255,0.05)",
             "backdrop-filter": "blur(6px)",
-            color: "#fff",
             display: "flex",
             "flex-direction": "column",
             "justify-content": "center",
@@ -180,11 +190,11 @@ function TimeFormatSetting() {
   return (
     <SettingsBlock
       icon="schedule"
-      label={t("settings.interface.timeTitle")} 
+      label={t("settings.interface.timeTitle")}
       description={t(
         timeFormat() === "24hr"
-      ? t("settings.interface.24HourFormatDescription")
-      : t("settings.interface.12HourFormatDescription")
+          ? t("settings.interface.24HourFormatDescription")
+          : t("settings.interface.12HourFormatDescription"),
       )}
     >
       <Checkbox checked={timeFormat() === "12hr"} onChange={toggleTimeFormat} />
@@ -197,7 +207,7 @@ function ChatBar() {
   const [chatBarOptions, setChatBarOptions] = useChatBarOptions();
   const [enabled, setEnabled] = useLocalStorage(
     StorageKeys.DISABLED_ADVANCED_MARKUP,
-    false
+    false,
   );
   const options = [
     {
@@ -247,8 +257,8 @@ function ChatBar() {
               if (chatBarOptions().includes(id)) {
                 setChatBarOptions(
                   options.filter(
-                    (i) => i !== (id as unknown as OptionIds)
-                  ) as unknown as OptionIds
+                    (i) => i !== (id as unknown as OptionIds),
+                  ) as unknown as OptionIds,
                 );
               } else {
                 setChatBarOptions([
@@ -263,13 +273,15 @@ function ChatBar() {
         )}
       </For>
       <SettingsBlock
-      icon="mobile_dots"
-      label={t("settings.interface.disableAdvancedMarkupBar")}
-      description={t("settings.interface.disableAdvancedMarkupBarDescription")}
-      borderTopRadius={false}
-    >
-      <Checkbox onChange={setEnabled} checked={enabled()} />
-    </SettingsBlock>
+        icon="mobile_dots"
+        label={t("settings.interface.disableAdvancedMarkupBar")}
+        description={t(
+          "settings.interface.disableAdvancedMarkupBarDescription",
+        )}
+        borderTopRadius={false}
+      >
+        <Checkbox onChange={setEnabled} checked={enabled()} />
+      </SettingsBlock>
     </FlexColumn>
   );
 }
@@ -308,6 +320,19 @@ function BlurEffect() {
 }
 
 function CustomizeColors() {
+  const copyThemeClipboard = () => {
+    navigator.clipboard.writeText(JSON.stringify(currentTheme()));
+    toast(t("settings.interface.exportModal"));
+  };
+
+  const importTheme = () => {
+    const theme = JSON.parse(
+      prompt(t("settings.interface.importModal"))! as string,
+    ) as Theme;
+    setCustomColors(theme);
+    updateTheme();
+  };
+
   return (
     <div>
       <SettingsBlock
@@ -315,31 +340,97 @@ function CustomizeColors() {
         label={t("settings.interface.customizeColors")}
         description={t("settings.interface.customizeColorsDescription")}
         header
-      />
-      <For each={Object.entries(currentTheme())}>
-        {([name, value], i) => (
-          <SettingsBlock
-            icon="colors"
-            class={style.themeItem}
-            label={name.replaceAll("-", " ")}
-            borderBottomRadius={i() === Object.keys(currentTheme()).length - 1}
-            borderTopRadius={false}
-          >
-            <Show when={customColors()[name] && DefaultTheme[name] !== value}>
-              <Button
-                iconName="restart_alt"
-                padding={2}
-                onClick={() => setThemeColor(name, undefined)}
-              />
+      >
+        <Button
+          label={t("settings.interface.exportButton")}
+          iconName="content_copy"
+          onClick={copyThemeClipboard}
+        />
+        <Button
+          label={t("settings.interface.importButton")}
+          iconName="content_paste"
+          onClick={importTheme}
+        />
+      </SettingsBlock>
+      <For each={ThemeTokens}>
+        {(token, i) => (
+          <>
+            <Show
+              when={
+                i() === 0 || ThemeTokens[i() - 1]?.category !== token.category
+              }
+            >
+              <div class={style.tokenCategory}>{token.category}</div>
             </Show>
-            <ColorPicker
-              alpha
-              color={value}
-              onChange={(v) => setThemeColor(name, v)}
-            />
-          </SettingsBlock>
+            <SettingsBlock
+              icon="colors"
+              class={style.themeItem}
+              label={token.key.replaceAll("-", " ")}
+              borderBottomRadius={
+                i() === Object.keys(currentTheme()).length - 1
+              }
+              borderTopRadius={false}
+            >
+              <Show
+                when={
+                  currentTheme()[token.key] &&
+                  DefaultTheme[token.key] !== currentTheme()[token.key]
+                }
+              >
+                <Button
+                  iconName="restart_alt"
+                  padding={2}
+                  onClick={() => setThemeColor(token.key, undefined)}
+                />
+              </Show>
+              <ColorPicker
+                alpha
+                color={currentTheme()[token.key]}
+                onChange={(v) => setThemeColor(token.key, v)}
+              />
+            </SettingsBlock>
+          </>
         )}
       </For>
     </div>
+  );
+}
+
+function RightDrawerModeBlock() {
+  const [mode, setMode] = rightDrawerMode;
+  return (
+    <FlexColumn>
+      <SettingsBlock icon="right_panel_open" label={t("settings.interface.rightDrawerMode")} header />
+
+      <SettingsBlock
+        label={t("settings.interface.swipeToOpen")}
+        description={t("settings.interface.swipeToOpenDescription")}
+        icon="swipe"
+        borderTopRadius={false}
+        borderBottomRadius={false}
+        onClick={() => {
+          setMode("SWIPE");
+        }}
+      >
+        <RadioBoxItem
+          selected={mode() === "SWIPE"}
+          item={{ id: 0, label: "" }}
+        />
+      </SettingsBlock>
+      <SettingsBlock
+        label={t("settings.interface.headerTapToOpen")}
+        description={t("settings.interface.headerTapToOpenDescription")}
+        icon="highlight_mouse_cursor"
+        borderTopRadius={false}
+        onClick={() => {
+          setMode("HEADER_CLICK");
+        }}
+      >
+        <RadioBoxItem
+          selected={mode() === "HEADER_CLICK"}
+          item={{ id: 0, label: "" }}
+        />
+      </SettingsBlock>
+    </FlexColumn>
   );
 }

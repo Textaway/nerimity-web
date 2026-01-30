@@ -32,7 +32,7 @@ import {
 } from "@/chat-api/services/MessageService";
 import { ChannelType, RawAttachment, RawMessage } from "@/chat-api/RawData";
 import env from "@/common/env";
-import { classNames, conditionalClass } from "@/common/classNames";
+import { classNames, cn, conditionalClass } from "@/common/classNames";
 import socketClient from "@/chat-api/socketClient";
 import { ServerEvents } from "@/chat-api/EventNames";
 import { emitScrollToMessage } from "@/common/GlobalEvents";
@@ -55,6 +55,8 @@ import { FlexRow } from "../ui/Flexbox";
 import { Item } from "../ui/Item";
 import { VirtualList } from "../ui/VirtualList";
 import { Fonts, getFont } from "@/common/fonts";
+import { Channel } from "@/chat-api/store/useChannels";
+import { matchSorter } from "match-sorter";
 
 const MemberItem = (props: {
   member: ServerMember;
@@ -91,27 +93,26 @@ const MemberItem = (props: {
     createRegisteredPortal(
       "ProfileFlyout",
       {
-        triggerEl: e.target as HTMLElement,
+        triggerEl: e.currentTarget as HTMLElement,
         position: { left: rect.left, top: rect.top },
         serverId: params.serverId,
         close: close,
         userId: user().id,
       },
       "profile-pane-flyout-" + user().id,
-      true
+      true,
     );
   };
 
   const topRoleWithColor = createMemo(() => props.member.topRoleWithColor());
 
   const font = createMemo(() =>
-    getFont(props.member.user().profile?.font || 0)
+    getFont(props.member.user().profile?.font || 0),
   );
 
   return (
     <div
       style={props.style}
-      class="trigger-profile-flyout"
       onMouseEnter={() => {
         userDetailsPreloader.preload(user().id);
         setHovering(true);
@@ -127,7 +128,7 @@ const MemberItem = (props: {
       <div
         onClick={onClick}
         ref={elementRef}
-        class={styles.memberItem}
+        class={cn(styles.memberItem, "trigger-profile-flyout")}
         onContextMenu={onContextMenu}
       >
         <Avatar
@@ -145,6 +146,7 @@ const MemberItem = (props: {
               "--color": topRoleWithColor()?.hexColor!,
               "--font": `'${font()?.name}'`,
               "--lh": font()?.lineHeight,
+              "--ls": font()?.letterSpacing,
               "--scale": font()?.scale,
             }}
           >
@@ -219,7 +221,7 @@ const Header = (props: {
     >
       <Button
         class={classNames(
-          props.selectedPage === "info" && selectedHeaderButtonStyle
+          props.selectedPage === "info" && selectedHeaderButtonStyle,
         )}
         iconName="info"
         label={t("informationDrawer.info")}
@@ -230,7 +232,7 @@ const Header = (props: {
       />
       <Button
         class={classNames(
-          props.selectedPage === "attachments" && selectedHeaderButtonStyle
+          props.selectedPage === "attachments" && selectedHeaderButtonStyle,
         )}
         iconName="attach_file"
         type="hover_border"
@@ -241,7 +243,7 @@ const Header = (props: {
       />
       <Button
         class={classNames(
-          props.selectedPage === "search" && selectedHeaderButtonStyle
+          props.selectedPage === "search" && selectedHeaderButtonStyle,
         )}
         iconName="search"
         label={t("general.searchPlaceholder")}
@@ -264,8 +266,8 @@ const RightDrawer = () => {
       () => params.channelId,
       () => {
         setPage("info");
-      }
-    )
+      },
+    ),
   );
 
   return (
@@ -298,7 +300,7 @@ const AttachmentDrawer = () => {
   const { channels } = useStore();
 
   const [attachments, setAttachments] = createSignal<RawAttachment[] | null>(
-    null
+    null,
   );
   const channel = () => channels.get(params.channelId);
 
@@ -338,8 +340,8 @@ const AttachmentDrawer = () => {
     if (payload.channelId !== params.channelId) return;
     setAttachments(
       attachments()!.filter(
-        (attachment) => attachment.messageId !== payload.messageId
-      )
+        (attachment) => attachment.messageId !== payload.messageId,
+      ),
     );
     decrAttachments(params.channelId);
   };
@@ -400,7 +402,7 @@ const AttachmentImage = (props: { attachment: RawAttachment }) => {
     <div
       class={classNames(
         styles.attachmentImageContainer,
-        conditionalClass(isGif(), styles.gif)
+        conditionalClass(isGif(), styles.gif),
       )}
     >
       <div class={styles.attachmentHover} onClick={onClicked}>
@@ -530,7 +532,7 @@ const ServerDrawer = () => {
   });
 
   const offlineMembers = createMemo(() =>
-    members().filter((member) => !member?.user().presence()?.status)
+    members().filter((member) => !member?.user().presence()?.status),
   );
   const defaultRole = () =>
     serverRoles.get(server()?.id!, server()?.defaultRoleId!);
@@ -558,7 +560,7 @@ const ServerDrawer = () => {
                     members={item
                       .members()
                       .sort((a, b) =>
-                        a?.user().username.localeCompare(b?.user().username)
+                        a?.user().username.localeCompare(b?.user().username),
                       )}
                     roleName={item.role?.name!}
                     roleIcon={item.role?.icon!}
@@ -570,7 +572,7 @@ const ServerDrawer = () => {
             {/* Offline */}
             <RoleItem
               members={offlineMembers().sort((a, b) =>
-                a?.user().username.localeCompare(b?.user().username)
+                a?.user().username.localeCompare(b?.user().username),
               )}
               roleName={t("status.offline")}
               roleIcon={defaultRole()?.icon}
@@ -597,18 +599,15 @@ function RoleItem(props: {
       onMouseLeave={() => setHovered(false)}
     >
       <div class={styles.roleTitle} onClick={() => setExpanded(!expanded())}>
-        <div class={styles.roleName}>
-          {" "}
-          <Show when={props.roleIcon}>
-            <Emoji
-              hovered={hovered()}
-              size={16}
-              resize={26}
-              icon={props.roleIcon}
-            />
-          </Show>{" "}
-          {props.roleName}
-        </div>
+        <Show when={props.roleIcon}>
+          <Emoji
+            hovered={hovered()}
+            size={16}
+            resize={26}
+            icon={props.roleIcon}
+          />
+        </Show>
+        <div class={styles.roleName}>{props.roleName}</div>
         <div class={styles.roleCount}>
           {props.members.length.toLocaleString()}
         </div>
@@ -655,6 +654,163 @@ const ServerChannelNotice = () => {
   );
 };
 
+const normalizeText = (str?: string) => str?.normalize("NFKC") || "";
+
+function getTextBeforeCursor(element?: HTMLInputElement) {
+  if (!element) return "";
+  const cursorPosition = element.selectionStart || 0;
+  const textBeforeCursor = element.value.substring(0, cursorPosition);
+  const lastWord = textBeforeCursor.split(/\s+/).reverse()[0];
+  return lastWord;
+}
+
+const SearchInputBox = (props: {
+  channel?: Channel;
+  query: string;
+  setQuery: (query: string) => void;
+  users: ServerMember[];
+  setUsers: (users: ServerMember[]) => void;
+}) => {
+  const store = useStore();
+  const params = useParams<{ serverId?: string; channelId?: string }>();
+  const [inputRef, setInputRef] = createSignal<HTMLInputElement>();
+
+  const [textBefore, setTextBefore] = createSignal("");
+  const [isFocus, setIsFocus] = createSignal(false);
+  const onFocus = () => setIsFocus(true);
+
+  const onSelectionChange = () => {
+    if (!isFocus()) return;
+    update();
+  };
+
+  createEffect(() => {
+    inputRef()?.addEventListener("focus", onFocus);
+    document.addEventListener("selectionchange", onSelectionChange);
+    onCleanup(() => {
+      inputRef()?.removeEventListener("focus", onFocus);
+      document.removeEventListener("selectionchange", onSelectionChange);
+    });
+  });
+
+  const update = () => {
+    if (inputRef()?.selectionStart !== inputRef()?.selectionEnd)
+      return setIsFocus(false);
+    setIsFocus(true);
+    const textBefore = getTextBeforeCursor(inputRef());
+    setTextBefore(normalizeText(textBefore));
+  };
+
+  const members = () => store.serverMembers.array(params.serverId!);
+
+  const suggestUsers = () => textBefore().startsWith("@");
+  const userSearchQuery = () => textBefore().substring(1);
+  const searchedServerUsers = createMemo(() => {
+    if (!suggestUsers()) return [];
+    return matchSorter(
+      members(),
+
+      userSearchQuery(),
+      {
+        keys: [
+          (e) => normalizeText(e?.user?.().username),
+          (e) => normalizeText(e?.nickname!),
+        ],
+      },
+    ).slice(0, 10);
+  });
+
+  const handleSuggestUserClick = (member: ServerMember) => {
+    if (props.users.find((u) => u.userId === member.userId)) return;
+    props.setUsers([...props.users, member]);
+
+    const input = inputRef();
+    if (!input || input.selectionStart === null) return;
+
+    const cursorPos = input.selectionStart;
+    const beforeCursor = input.value.substring(0, cursorPos);
+
+    const lastAtIndex = beforeCursor.lastIndexOf("@");
+    if (lastAtIndex === -1) return;
+
+    const beforeMention = input.value.substring(0, lastAtIndex);
+    const afterCursor = input.value.substring(cursorPos);
+    const newQuery = beforeMention + afterCursor;
+
+    props.setQuery(newQuery);
+
+    input.focus();
+    input.setSelectionRange(lastAtIndex, lastAtIndex);
+    update();
+  };
+
+  return (
+    <>
+      <Input
+        ref={setInputRef}
+        placeholder={
+          props.channel?.name
+            ? t("informationDrawer.searchBarChannelPlaceholder", {
+                channelName: props.channel!.name,
+                interpolation: { escapeValue: false },
+              })
+            : props.channel?.recipient()?.username
+              ? t("informationDrawer.searchBarPlaceholder", {
+                  username: props.channel?.recipient()?.username,
+                  interpolation: { escapeValue: false },
+                })
+              : ""
+        }
+        onText={props.setQuery}
+        value={props.query}
+        onBlur={() => setIsFocus(false)}
+      />
+      <Show when={isFocus() && searchedServerUsers().length}>
+        <div class={styles.searchUserSuggestions}>
+          <For each={searchedServerUsers()}>
+            {(member) => (
+              <div
+                class={styles.searchUserSuggestionItem}
+                onMouseDown={(e) => {
+                  e.preventDefault();
+                }}
+                onClick={() => handleSuggestUserClick(member!)}
+              >
+                <Avatar size={24} user={member?.user()} resize={28} />
+                <div>{member?.nickname || member?.user()?.username}</div>
+              </div>
+            )}
+          </For>
+        </div>
+      </Show>
+      <Show when={props.users.length}>
+        <div class={styles.searchSelectedUsers}>
+          <For each={props.users}>
+            {(member) => (
+              <div
+                class={styles.searchSelectedUser}
+                onClick={() => {
+                  props.setUsers(
+                    props.users.filter((u) => u.userId !== member.userId),
+                  );
+                }}
+              >
+                <Avatar size={20} user={member?.user()} resize={28} />
+                <div>{member?.nickname || member?.user()?.username}</div>
+                <Icon
+                  name="close"
+                  size={18}
+                  class={styles.removeSelectedUser}
+                />
+              </div>
+            )}
+          </For>
+        </div>
+      </Show>
+    </>
+  );
+};
+
 const SearchDrawer = () => {
   const store = useStore();
   const params = useParams<{ serverId?: string; channelId?: string }>();
@@ -664,47 +820,40 @@ const SearchDrawer = () => {
   const [containerEl, setContainerEl] = createSignal<HTMLDivElement>();
   const [order, setOrder] = createSignal<"asc" | "desc">("desc");
 
+  const [users, setUsers] = createSignal<ServerMember[]>([]);
+
   const { width: containerWidth } = useResizeObserver(containerEl);
 
   const channel = () => store.channels.get(params.channelId!);
 
   let interval = 0;
   createEffect(
-    on([query, order], () => {
+    on([query, order, users], () => {
       setResults(null);
       window.clearTimeout(interval);
 
       interval = window.setTimeout(() => {
-        searchMessages(query(), params.channelId!, { order: order() }).then(
-          (res) => {
-            if (order() === "desc") res.reverse();
-            setResults(res);
-          }
-        );
+        const userIds = users().map((u) => u.userId);
+        searchMessages(query(), params.channelId!, {
+          order: order(),
+          userIds,
+        }).then((res) => {
+          if (order() === "desc") res.reverse();
+          setResults(res);
+        });
       }, 1000);
-    })
+    }),
   );
   onCleanup(() => window.clearTimeout(interval));
 
   return (
     <div class={styles.searchDrawer} ref={setContainerEl}>
-      <Input
-        // placeholder={`Search ${!isDMChannel() ? "in " : ""}${name() || ""}`}
-        placeholder={
-          channel()?.name
-            ? t("informationDrawer.searchBarChannelPlaceholder", {
-                channelName: channel()!.name,
-                interpolation: { escapeValue: false },
-              })
-            : channel()?.recipient()?.username
-            ? t("informationDrawer.searchBarPlaceholder", {
-                username: channel()?.recipient()?.username,
-                interpolation: { escapeValue: false },
-              })
-            : ""
-        }
-        onText={setQuery}
-        value={query()}
+      <SearchInputBox
+        setUsers={setUsers}
+        users={users()}
+        channel={channel()}
+        query={query()}
+        setQuery={setQuery}
       />
       <FlexRow gap={4} class={styles.searchOrder}>
         <Item.Root
@@ -755,13 +904,13 @@ const SearchMessageItem = (props: {
       navigate(
         RouterEndpoints.SERVER_MESSAGES(params.serverId, channelId) +
           "?messageId=" +
-          props.message.id
+          props.message.id,
       );
     } else {
       navigate(
         RouterEndpoints.INBOX_MESSAGES(channelId) +
           "?messageId=" +
-          props.message.id
+          props.message.id,
       );
     }
   };

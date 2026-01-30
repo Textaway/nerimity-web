@@ -25,6 +25,7 @@ import { SupportBlock } from "../SupportBlock";
 import { useWindowProperties } from "@/common/useWindowProperties";
 import { Rerun } from "@solid-primitives/keyed";
 import { getCurrentLanguage } from "@/locales/languages";
+import { LogoutModal } from "./LogoutModal";
 
 const DrawerContainer = styled(FlexColumn)`
   height: 100%;
@@ -45,15 +46,12 @@ const SettingItemContainer = styled(ItemContainer)<{ nested?: boolean }>`
   padding-left: ${(props) => (props.nested ? "25px" : "10px")};
   margin-left: 3px;
   margin-right: 3px;
-  :first {
-    background-color: red;
-  }
 
   .label {
     opacity: ${(props) => (props.selected ? 1 : 0.6)};
     font-size: 14px;
     transition: 0.2s;
-    color: white;
+    color: var(--text-color);
   }
 
   &:hover .label {
@@ -74,7 +72,6 @@ const FooterContainer = styled(FlexColumn)`
 
 function Footer() {
   const [t] = useTransContext();
-  const navigate = useNavigate();
   const { createPortal } = useCustomPortal();
   const { isMobileWidth } = useWindowProperties();
 
@@ -82,8 +79,7 @@ function Footer() {
     createPortal?.((close) => <ChangelogModal close={close} />);
 
   const onLogoutClick = async () => {
-    await clearCache();
-    logout();
+    createPortal((close) => <LogoutModal close={close} />);
   };
 
   return (
